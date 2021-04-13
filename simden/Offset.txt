@@ -1,0 +1,51 @@
+/// ///////////////////////////////
+///
+/// BOOLEAN
+/// Value: ByteBool
+/// NullFlag: WordBool
+///
+/// SMALLINT
+/// Value: SmallInt
+/// NullFlag: WordBool
+///
+/// INTEGER
+/// Value: Integer
+/// NullFlag: WordBool
+///
+/// BIGINT
+/// Value: LargeInt
+/// NullFlag: WordBool
+///
+/// FLOAT
+/// Value: Single
+/// NullFlag: WordBool
+///
+/// DOUBLE PRECISION
+/// Value: Double
+/// NullFlag: WordBool
+///
+/// CHAR(N)
+/// Value: array[0 .. N-1] of AnsiChar
+/// NullFlag: WordBool
+///
+/// VARCHAR(N)
+/// Length: Word
+/// Value: array[0 .. N-1] of AnsiChar
+/// NullFlag: WordBool
+///
+/// DATE
+/// Value: ISC_DATE
+/// NullFlag: WordBool
+///
+/// TIME
+/// Value: ISC_TIME
+/// NullFlag: WordBool
+///
+/// DATETIME
+/// Value: ISC_TIMESTAMP
+/// NullFlag: WordBool
+///
+/// BLOB
+/// Value: ISC_QUAD
+/// NullFlag: WordBool
+
