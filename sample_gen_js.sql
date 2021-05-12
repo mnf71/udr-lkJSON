@@ -18,7 +18,7 @@ BEGIN
     js$Obj.AddDouble(jsRec, 'Double', cS.Dbl);
     js$Obj.AddString(jsRec, 'String', cS.Str);
     js$Obj.AddString(jsRec, 'DateTime', cS.DMY);
-    js$Obj.Add_ -- jsRec appointed js$Ptr.Att(), no Dispose (!)
+    js$Obj.Add_ -- jsRec assigned js$Att, no call Dispose (!)
       (js$Ptr.Att(), CAST(cS.Rec AS VARCHAR(10)), jsRec);
   END
   js$Num.Value_(js$Obj.Field(js$Ptr.Att(), 'Records'), i);
