@@ -51,7 +51,7 @@ AS
   END
 BEGIN
   /*
-     After rec_load.sql
+     After ..._gen_js.sql
   */
   FOR
     SELECT j.* FROM js$Obj.ForEach(js$Ptr.Att()) j AS CURSOR c0
