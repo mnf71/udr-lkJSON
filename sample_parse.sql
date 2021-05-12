@@ -12,7 +12,7 @@ AS
   DECLARE PROCEDURE Value_ (
     jsPtr TY$POINTER
   ) RETURNS (
-    v VARCHAR(512)
+    v VARCHAR(32)
   )
   AS
   BEGIN
