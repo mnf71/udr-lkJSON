@@ -1568,29 +1568,24 @@ procedure TjsObjectField.execute
 var
   I: PjsInObjectField;
   O: PjsOutObjectField;
-  V: Variant;
 begin
   I := PjsInObjectField(AInMsg);
   O := PjsOutObjectField(AOutMsg);
   O^.Obj.Null := True;
   if I^.Self.Null or I^.Name.Null then
     Exit;
-  try
-    V := StrToInt(I^.Name.Val); except
-    V := I^.Name.Val;
-  end;
   if I^.Obj.Null then
   // Get
   begin
     O^.Obj.Ptr :=
       TjsPtr(NativeIntPtr(
-        TlkJSONobject(NativeIntPtr(TjsPtr(I^.Self.Ptr))).Field[V]));
+        TlkJSONobject(NativeIntPtr(TjsPtr(I^.Self.Ptr))).Field[I^.Name.Val]));
     O^.Obj.Null := False;
   end
   else
   // Set
   begin
-    TlkJSONobject(NativeIntPtr(TjsPtr(I^.Self.Ptr))).Field[V] :=
+    TlkJSONobject(NativeIntPtr(TjsPtr(I^.Self.Ptr))).Field[I^.Name.Val] :=
       TlkJSONbase(NativeIntPtr(TjsPtr(I^.Obj.Ptr)));
     O^.Obj.Ptr := I^.Obj.Ptr;
     O^.Obj.Null := False;
@@ -2281,20 +2276,34 @@ procedure TjsBaseField.execute
 var
   I: PjsInBaseField;
   O: PjsOutBaseField;
-  V: Variant;
+  P: TlkJSONbase;
+  N: Integer;
 begin
   I := PjsInBaseField(AInMsg);;
   O := PjsOutBaseField(AOutMsg);
   O^.Obj.Null := True;
   if I^.Self.Null or I^.Name.Null then
     Exit;
-  try
-    V := StrToInt(I^.Name.Val); except
-    V := I^.Name.Val;
+  case TlkJSONbase(NativeIntPtr(TjsPtr(I^.Self.Ptr))).SelfType of
+    jsBase,
+    jsNumber,
+    jsString,
+    jsBoolean,
+    jsNull:
+      O^.Obj.Ptr :=
+        TjsPtr(NativeIntPtr(
+          TlkJSONbase(NativeIntPtr(TjsPtr(I^.Self.Ptr))).Field[I^.Name.Val]));
+    jsList,
+    jsObject:
+      begin
+        P := Nil;
+        if TryStrToInt(I^.Name.Val, N) then
+          P := TlkJSONbase(NativeIntPtr(TjsPtr(I^.Self.Ptr))).Field[N];
+        if P = Nil then
+          P := TlkJSONbase(NativeIntPtr(TjsPtr(I^.Self.Ptr))).Field[I^.Name.Val];
+        O^.Obj.Ptr := TjsPtr(NativeIntPtr(P));
+      end;
   end;
-  O^.Obj.Ptr :=
-    TjsPtr(NativeIntPtr(
-      TlkJSONbase(NativeIntPtr(TjsPtr(I^.Self.Ptr))).Field[V]));
   O^.Obj.Null := False;
 end;
 
@@ -2936,5 +2945,4 @@ begin
 end;
 
 end.
-
 
