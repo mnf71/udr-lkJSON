@@ -26,7 +26,7 @@ BEGIN
   */
   FUNCTION Dispose(Self TY$POINTER) RETURNS SMALLINT; /* 0 - succes */
 
-  FUNCTION Field(Self TY$POINTER, Name VARCHAR(128) /* 1..N = Idx */) RETURNS TY$POINTER;
+  FUNCTION Field(Self TY$POINTER, Name VARCHAR(128) /* = Idx */) RETURNS TY$POINTER;
 
   FUNCTION Count_(Self TY$POINTER) RETURNS INTEGER;
   FUNCTION Child(Self TY$POINTER, Idx INTEGER, Obj TY$POINTER = NULL /* Get */) RETURNS TY$POINTER;
@@ -63,7 +63,7 @@ BEGIN
   PROCEDURE ForEach
     (Self TY$POINTER) RETURNS (Idx Integer, Name VARCHAR(128), Obj TY$POINTER /* js$Base */);
 
-  FUNCTION Field(Self TY$POINTER, Name VARCHAR(128) /* 1..N = Idx */) RETURNS TY$POINTER;
+  FUNCTION Field(Self TY$POINTER, Name VARCHAR(128) /* = Idx */) RETURNS TY$POINTER;
   FUNCTION Count_(Self TY$POINTER) RETURNS INTEGER;
   FUNCTION Child(Self TY$POINTER, Idx INTEGER, Obj TY$POINTER = NULL /* Get */) RETURNS TY$POINTER;
 
@@ -108,7 +108,7 @@ BEGIN
 
   FUNCTION Delete_(Self TY$POINTER, Idx Integer) RETURNS SMALLINT;
   FUNCTION IndexOfObject(Self TY$POINTER, Obj TY$POINTER) RETURNS INTEGER;
-  FUNCTION Field(Self TY$POINTER, Name VARCHAR(128) /* 1..N = Idx */) RETURNS TY$POINTER;
+  FUNCTION Field(Self TY$POINTER, Name VARCHAR(128) /* = Idx */) RETURNS TY$POINTER;
 
   FUNCTION Count_(Self TY$POINTER) RETURNS INTEGER;
   FUNCTION Child(Self TY$POINTER, Idx INTEGER, Obj TY$POINTER = NULL /* Get */) RETURNS TY$POINTER;
@@ -185,7 +185,7 @@ BEGIN
   FUNCTION Delete_(Self TY$POINTER, Idx Integer) RETURNS SMALLINT;
   FUNCTION IndexOfName(Self TY$POINTER, Name VARCHAR(128)) RETURNS INTEGER;
   FUNCTION IndexOfObject(Self TY$POINTER, Obj TY$POINTER) RETURNS INTEGER;
-  FUNCTION Field(Self TY$POINTER, Name VARCHAR(128) /* 1..N = Idx */, Obj TY$POINTER = NULL /* Get */) RETURNS TY$POINTER;
+  FUNCTION Field(Self TY$POINTER, Name VARCHAR(128) /* = Idx */, Obj TY$POINTER = NULL /* Get */) RETURNS TY$POINTER;
 
   FUNCTION Count_(Self TY$POINTER) RETURNS INTEGER;
   FUNCTION Child(Self TY$POINTER, Idx INTEGER, Obj TY$POINTER = NULL /* Get */) RETURNS TY$POINTER;
@@ -342,8 +342,8 @@ BEGIN
     BEGIN
       Name = CAST(Idx AS VARCHAR(128));
       Obj = Child(Self, Idx);
-      Idx = Idx + 1;
       SUSPEND;
+      Idx = Idx + 1;
     END 
   END
 
@@ -572,8 +572,8 @@ BEGIN
     BEGIN
       Name = NameOf(Self, Idx);
       Obj = FieldByIndex(Self, Idx);
-      Idx = Idx + 1;
       SUSPEND;
+      Idx = Idx + 1;
     END 
   END
 
@@ -868,17 +868,3 @@ BEGIN
 END
 ^
 SET TERM ; ^
-
-
-
-/******************************************************************************/
-/***                               Privileges                               ***/
-/******************************************************************************/
-
-
-
-/******************************************************************************/
-/***                             DDL privileges                             ***/
-/******************************************************************************/
-
-
