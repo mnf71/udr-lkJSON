@@ -152,7 +152,7 @@ unit uLkJSON;
 {$ELSE}
   {$IF RTLVersion > 14.00}
     {$DEFINE HAVE_FORMATSETTING}
-    {$IF RTLVersion > 19.00}                            null Value
+    {$IF RTLVersion > 19.00} 
       {$DEFINE USE_D2009}
     {$IFEND}
     {$H+}
