@@ -1376,6 +1376,7 @@ begin
     O^.Self.Null := False;
   except
     O^.Self.Null := True;
+    raise;
   end;
 end;
 
@@ -1387,18 +1388,16 @@ var
 begin
   I := PjsInObjectDispose(AInMsg);
   O := PjsOutObjectDispose(AOutMsg);
+  O^.Res.Val := 1; // err
+  O^.Res.Null := False;
   if I^.Self.Null then
-  begin
-    O^.Res.Null := True;
     Exit;
-  end;
   try
     TlkJSONobject(NativeIntPtr(TjsPtr(I^.Self.Ptr))).Free;
     O^.Res.Val := 0; // sucess
   except
-    O^.Res.Val := 1; // err
+    raise;
   end;
-  O^.Res.Null := False;
 end;
 
 procedure TjsObjectAdd.execute
@@ -1409,13 +1408,13 @@ var
 begin
   I := PjsInObjectAdd(AInMsg);
   O := PjsOutObjectAdd(AOutMsg);
-  O^.Idx.Null := True;
+  O^.Idx.Val := -1;
+  O^.Idx.Null := False;
   if I^.Self.Null or I^.Name.Null or I^.Obj.Null then
     Exit;
   O^.Idx.Val :=
     TlkJSONobject(NativeIntPtr(TjsPtr(I^.Self.Ptr))).
       Add(I^.Name.Val, TlkJSONbase(NativeIntPtr(TjsPtr(I^.Obj.Ptr))));
-  O^.Idx.Null := False;
 end;
 
 procedure TjsObjectAddBoolean.execute
@@ -1426,13 +1425,18 @@ var
 begin
   I := PjsInObjectAddBoolean(AInMsg);
   O := PjsOutObjectAddBoolean(AOutMsg);
-  O^.Idx.Null := True;
-  if I^.Self.Null or I^.Name.Null or I^.Bool.Null then
-    Exit;
-  O^.Idx.Val :=
-    TlkJSONobject(NativeIntPtr(TjsPtr(I^.Self.Ptr))).
-      Add(I^.Name.Val, I^.Bool.Val);
+  O^.Idx.Val := -1;
   O^.Idx.Null := False;
+  if I^.Self.Null or I^.Name.Null then
+    Exit;
+  if I^.Bool.Null then
+    O^.Idx.Val :=
+      TlkJSONobject(NativeIntPtr(TjsPtr(I^.Self.Ptr))).
+        Add(I^.Name.Val, TlkJSONnull.Generate())
+  else
+    O^.Idx.Val :=
+      TlkJSONobject(NativeIntPtr(TjsPtr(I^.Self.Ptr))).
+        Add(I^.Name.Val, I^.Bool.Val);
 end;
 
 procedure TjsObjectAddDouble.execute
@@ -1443,13 +1447,18 @@ var
 begin
   I := PjsInObjectAddDouble(AInMsg);
   O := PjsOutObjectAddDouble(AOutMsg);
-  O^.Idx.Null := True;
-  if I^.Self.Null or I^.Name.Null or I^.Dbl.Null then
-    Exit;
-  O^.Idx.Val :=
-    TlkJSONobject(NativeIntPtr(TjsPtr(I^.Self.Ptr))).
-      Add(I^.Name.Val, I^.Dbl.Val);
+  O^.Idx.Val := -1;
   O^.Idx.Null := False;
+  if I^.Self.Null or I^.Name.Null then
+    Exit;
+  if I^.Dbl.Null then
+    O^.Idx.Val :=
+      TlkJSONobject(NativeIntPtr(TjsPtr(I^.Self.Ptr))).
+        Add(I^.Name.Val, TlkJSONnull.Generate())
+  else
+    O^.Idx.Val :=
+      TlkJSONobject(NativeIntPtr(TjsPtr(I^.Self.Ptr))).
+        Add(I^.Name.Val, I^.Dbl.Val);
 end;
 
 procedure TjsObjectAddInteger.execute
@@ -1460,13 +1469,18 @@ var
 begin
   I := PjsInObjectAddInteger(AInMsg);
   O := PjsOutObjectAddInteger(AOutMsg);
-  O^.Idx.Null := True;
-  if I^.Self.Null or I^.Name.Null or I^.Int.Null then
-    Exit;
-  O^.Idx.Val :=
-    TlkJSONobject(NativeIntPtr(TjsPtr(I^.Self.Ptr))).
-      Add(I^.Name.Val, I^.Int.Val);
+  O^.Idx.Val := -1;
   O^.Idx.Null := False;
+  if I^.Self.Null or I^.Name.Null then
+    Exit;
+  if I^.Int.Null then
+    O^.Idx.Val :=
+      TlkJSONobject(NativeIntPtr(TjsPtr(I^.Self.Ptr))).
+        Add(I^.Name.Val, TlkJSONnull.Generate())
+  else
+    O^.Idx.Val :=
+      TlkJSONobject(NativeIntPtr(TjsPtr(I^.Self.Ptr))).
+        Add(I^.Name.Val, I^.Int.Val);
 end;
 
 procedure TjsObjectAddString.execute
@@ -1477,13 +1491,18 @@ var
 begin
   I := PjsInObjectAddString(AInMsg);
   O := PjsOutObjectAddString(AOutMsg);
-  O^.Idx.Null := True;
-  if I^.Self.Null or I^.Name.Null or I^.Str.Null then
-    Exit;
-  O^.Idx.Val :=
-    TlkJSONobject(NativeIntPtr(TjsPtr(I^.Self.Ptr))).
-      Add(I^.Name.Val, String(I^.Str.Val));
+  O^.Idx.Val := -1;
   O^.Idx.Null := False;
+  if I^.Self.Null or I^.Name.Null then
+    Exit;
+  if I^.Str.Null then
+    O^.Idx.Val :=
+      TlkJSONobject(NativeIntPtr(TjsPtr(I^.Self.Ptr))).
+        Add(I^.Name.Val, TlkJSONnull.Generate())
+  else
+    O^.Idx.Val :=
+      TlkJSONobject(NativeIntPtr(TjsPtr(I^.Self.Ptr))).
+        Add(I^.Name.Val, String(I^.Str.Val));
 end;
 
 procedure TjsObjectAddWideString.execute
@@ -1495,18 +1514,25 @@ var
 begin
   I := PjsInObjectAddWideString(AInMsg);
   O := PjsOutObjectAddWideString(AOutMsg);
-  O^.Idx.Null := True;
-  if I^.Self.Null or I^.Name.Null or I^.WStr.Null then
+  O^.Idx.Val := -1;
+  O^.Idx.Null := False;
+  if I^.Self.Null or I^.Name.Null then
     Exit;
-  Stream := TStringStream.Create;
-  try
-    ReadBlobToStream(TStream(Stream), AStatus, AContext, @(I^.WStr.Ptr));
+  if I^.WStr.Null then
     O^.Idx.Val :=
       TlkJSONobject(NativeIntPtr(TjsPtr(I^.Self.Ptr))).
-        Add(I^.Name.Val, WideString(Stream.DataString));
-    O^.Idx.Null := False;
-  finally
-    Stream.Free;
+        Add(I^.Name.Val, TlkJSONnull.Generate())
+  else
+  begin
+    Stream := TStringStream.Create;
+    try
+      ReadBlobToStream(TStream(Stream), AStatus, AContext, @(I^.WStr.Ptr));
+      O^.Idx.Val :=
+        TlkJSONobject(NativeIntPtr(TjsPtr(I^.Self.Ptr))).
+          Add(I^.Name.Val, WideString(Stream.DataString));
+    finally
+      Stream.Free;
+    end;
   end;
 end;
 
@@ -1518,15 +1544,15 @@ var
 begin
   I := PjsInObjectDelete(AInMsg);
   O := PjsOutObjectDelete(AOutMsg);
-  O^.Res.Null := True;
+  O^.Res.Val := 1; // err
+  O^.Res.Null := False;
   if I^.Self.Null or I^.Idx.Null then
     Exit;
-  O^.Res.Null := False;
   try
     TlkJSONobject(NativeIntPtr(TjsPtr(I^.Self.Ptr))).Delete(I^.Idx.Val);
     O^.Res.Val := 0; // sucess
   except
-    O^.Res.Val := 1; // err
+    raise;
   end;
 end;
 
@@ -1538,12 +1564,12 @@ var
 begin
   I := PjsInObjectIndexOfName(AInMsg);
   O := PjsOutObjectIndexOfName(AOutMsg);
-  O^.Idx.Null := True;
+  O^.Idx.Val := -1;
+  O^.Idx.Null := False;
   if I^.Self.Null or I^.Name.Null then
     Exit;
   O^.Idx.Val :=
     TlkJSONobject(NativeIntPtr(TjsPtr(I^.Self.Ptr))).IndexOfName(I^.Name.Val);
-  O^.Idx.Null := False;
 end;
 
 procedure TjsObjectIndexOfObject.execute
@@ -1612,6 +1638,7 @@ begin
     O^.Obj.Null := False;
   except
     O^.Obj.Null := True;
+    raise;
   end;
 end;
 
@@ -1702,6 +1729,7 @@ procedure TjsObjectGetBoolean.execute
 var
   I: PjsInObjectGet;
   O: PjsOutObjectGetBoolean;
+  B: Boolean = False;
 begin
   I := PjsInObjectGet(AInMsg);
   O := PjsOutObjectGetBoolean(AOutMsg);
@@ -1709,8 +1737,9 @@ begin
   if I^.Self.Null or I^.Idx.Null then
     Exit;
   O^.Bool.Val :=
-    TlkJSONobject(NativeIntPtr(TjsPtr(I^.Self.Ptr))).getBoolean(I^.Idx.Val);
-  O^.Bool.Null := False;
+    TlkJSONobject(NativeIntPtr(TjsPtr(I^.Self.Ptr))).
+      getBoolean(I^.Idx.Val{$IFDEF NULL_SQL}, B{$ENDIF});
+  O^.Bool.Null := B;
 end;
 
 procedure TjsObjectGetDouble.execute
@@ -1718,6 +1747,7 @@ procedure TjsObjectGetDouble.execute
 var
   I: PjsInObjectGet;
   O: PjsOutObjectGetDouble;
+  B: Boolean = False;
 begin
   I := PjsInObjectGet(AInMsg);
   O := PjsOutObjectGetDouble(AOutMsg);
@@ -1725,8 +1755,9 @@ begin
   if I^.Self.Null or I^.Idx.Null then
     Exit;
   O^.Dbl.Val :=
-    TlkJSONobject(NativeIntPtr(TjsPtr(I^.Self.Ptr))).getDouble(I^.Idx.Val);
-  O^.Dbl.Null := False;
+    TlkJSONobject(NativeIntPtr(TjsPtr(I^.Self.Ptr))).
+      getDouble(I^.Idx.Val{$IFDEF NULL_SQL}, B{$ENDIF});
+  O^.Dbl.Null := B;
 end;
 
 procedure TjsObjectGetInteger.execute
@@ -1734,6 +1765,7 @@ procedure TjsObjectGetInteger.execute
 var
   I: PjsInObjectGet;
   O: PjsOutObjectGetInteger;
+  B: Boolean = False;
 begin
   I := PjsInObjectGet(AInMsg);
   O := PjsOutObjectGetInteger(AOutMsg);
@@ -1741,8 +1773,9 @@ begin
   if I^.Self.Null or I^.Idx.Null then
     Exit;
   O^.Int.Val :=
-    TlkJSONobject(NativeIntPtr(TjsPtr(I^.Self.Ptr))).getInt(I^.Idx.Val);
-  O^.Int.Null := False;
+    TlkJSONobject(NativeIntPtr(TjsPtr(I^.Self.Ptr))).
+      getInt(I^.Idx.Val{$IFDEF NULL_SQL}, B{$ENDIF});
+  O^.Int.Null := B;
 end;
 
 procedure TjsObjectGetString.execute
@@ -1751,16 +1784,19 @@ var
   I: PjsInObjectGet;
   O: PjsOutObjectGetString;
   S: String;
+  B: Boolean = False;
 begin
   I := PjsInObjectGet(AInMsg);
   O := PjsOutObjectGetString(AOutMsg);
   O^.Str.Null := True;
   if I^.Self.Null or I^.Idx.Null then
     Exit;
-  S := TlkJSONobject(NativeIntPtr(TjsPtr(I^.Self.Ptr))).getString(I^.Idx.Val);
+  S :=
+    TlkJSONobject(NativeIntPtr(TjsPtr(I^.Self.Ptr))).
+      getString(I^.Idx.Val{$IFDEF NULL_SQL}, B{$ENDIF});
   O^.Str.Len := Length(S);
   O^.Str.Val := S;
-  O^.Str.Null := False;
+  O^.Str.Null := B;
 end;
 
 procedure TjsObjectGetWideString.execute
@@ -1769,6 +1805,7 @@ var
   I: PjsInObjectGet;
   O: PjsOutObjectGetWideString;
   Stream: TStringStream;
+  B: Boolean = False;
 begin
   I := PjsInObjectGet(AInMsg);
   O := PjsOutObjectGetWideString(AOutMsg);
@@ -1778,10 +1815,11 @@ begin
   Stream := TStringStream.Create;
   try
     Stream.WriteUnicodeString(
-       TlkJSONobject(NativeIntPtr(TjsPtr(I^.Self.Ptr))).getWideString(I^.Idx.Val)
+       TlkJSONobject(NativeIntPtr(TjsPtr(I^.Self.Ptr))).
+         getWideString(I^.Idx.Val{$IFDEF NULL_SQL}, B{$ENDIF})
       );
     WriteStreamToBlob(TStream(Stream), AStatus, AContext, @(O^.WStr.Ptr));
-    O^.WStr.Null := False;
+    O^.WStr.Null := B;
   finally
     Stream.Free;
   end;
@@ -1792,6 +1830,7 @@ procedure TjsObjectGetBooleanByName.execute
 var
   I: PjsInObjectGetByName;
   O: PjsOutObjectGetBoolean;
+  B: Boolean = False;
 begin
   I := PjsInObjectGetByName(AInMsg);
   O := PjsOutObjectGetBoolean(AOutMsg);
@@ -1799,8 +1838,9 @@ begin
   if I^.Self.Null or I^.Name.Null then
     Exit;
   O^.Bool.Val :=
-    TlkJSONobject(NativeIntPtr(TjsPtr(I^.Self.Ptr))).getBoolean(I^.Name.Val);
-  O^.Bool.Null := False;
+     TlkJSONobject(NativeIntPtr(TjsPtr(I^.Self.Ptr))).
+      getBoolean(I^.Name.Val{$IFDEF NULL_SQL}, B{$ENDIF});
+  O^.Bool.Null := B;
 end;
 
 procedure TjsObjectGetDoubleByName.execute
@@ -1808,6 +1848,7 @@ procedure TjsObjectGetDoubleByName.execute
 var
   I: PjsInObjectGetByName;
   O: PjsOutObjectGetDouble;
+  B: Boolean = False;
 begin
   I := PjsInObjectGetByName(AInMsg);
   O := PjsOutObjectGetDouble(AOutMsg);
@@ -1815,8 +1856,9 @@ begin
   if I^.Self.Null or I^.Name.Null then
     Exit;
   O^.Dbl.Val :=
-    TlkJSONobject(NativeIntPtr(TjsPtr(I^.Self.Ptr))).getDouble(I^.Name.Val);
-  O^.Dbl.Null := False;
+    TlkJSONobject(NativeIntPtr(TjsPtr(I^.Self.Ptr))).
+      getDouble(I^.Name.Val{$IFDEF NULL_SQL}, B{$ENDIF});
+  O^.Dbl.Null := B;
 end;
 
 procedure TjsObjectGetIntegerByName.execute
@@ -1824,6 +1866,7 @@ procedure TjsObjectGetIntegerByName.execute
 var
   I: PjsInObjectGetByName;
   O: PjsOutObjectGetInteger;
+  B: Boolean = False;
 begin
   I := PjsInObjectGetByName(AInMsg);
   O := PjsOutObjectGetInteger(AOutMsg);
@@ -1831,8 +1874,9 @@ begin
   if I^.Self.Null or I^.Name.Null then
     Exit;
   O^.Int.Val :=
-    TlkJSONobject(NativeIntPtr(TjsPtr(I^.Self.Ptr))).getInt(I^.Name.Val);
-  O^.Int.Null := False;
+    TlkJSONobject(NativeIntPtr(TjsPtr(I^.Self.Ptr))).
+      getInt(I^.Name.Val{$IFDEF NULL_SQL}, B{$ENDIF});
+  O^.Int.Null := B;
 end;
 
 procedure TjsObjectGetStringByName.execute
@@ -1841,16 +1885,19 @@ var
   I: PjsInObjectGetByName;
   O: PjsOutObjectGetString;
   S: String;
+  B: Boolean = False;
 begin
   I := PjsInObjectGetByName(AInMsg);
   O := PjsOutObjectGetString(AOutMsg);
   O^.Str.Null := True;
   if I^.Self.Null or I^.Name.Null then
     Exit;
-  S := TlkJSONobject(NativeIntPtr(TjsPtr(I^.Self.Ptr))).getString(I^.Name.Val);
+  S :=
+    TlkJSONobject(NativeIntPtr(TjsPtr(I^.Self.Ptr))).
+      getString(I^.Name.Val{$IFDEF NULL_SQL}, B{$ENDIF});
   O^.Str.Len := Length(S);
   O^.Str.Val := S;
-  O^.Str.Null := False;
+  O^.Str.Null := B;
 end;
 
 procedure TjsObjectGetWideStringByName.execute
@@ -1859,6 +1906,7 @@ var
   I: PjsInObjectGetByName;
   O: PjsOutObjectGetWideString;
   Stream: TStringStream;
+  B: Boolean = False;
 begin
   I := PjsInObjectGetByName(AInMsg);
   O := PjsOutObjectGetWideString(AOutMsg);
@@ -1868,10 +1916,11 @@ begin
   Stream := TStringStream.Create;
   try
     Stream.WriteUnicodeString(
-       TlkJSONobject(NativeIntPtr(TjsPtr(I^.Self.Ptr))).getWideString(I^.Name.Val)
+       TlkJSONobject(NativeIntPtr(TjsPtr(I^.Self.Ptr))).
+        getWideString(I^.Name.Val{$IFDEF NULL_SQL}, B{$ENDIF})
       );
     WriteStreamToBlob(TStream(Stream), AStatus, AContext, @(O^.WStr));
-    O^.WStr.Null := False;
+    O^.WStr.Null := B;
   finally
     Stream.Free;
   end;
@@ -1951,6 +2000,7 @@ begin
     O^.Obj.Null := False;
   except
     O^.Obj.Null := True;
+    raise;
   end;
 end;
 
@@ -1981,12 +2031,16 @@ var
 begin
   I := PjsInListAddBoolean(AInMsg);
   O := PjsOutListAddBoolean(AOutMsg);
-  O^.Idx.Null := True;
-  if I^.Self.Null or I^.Bool.Null then
-    Exit;
-  O^.Idx.Val :=
-    TlkJSONlist(NativeIntPtr(TjsPtr(I^.Self.Ptr))).Add(I^.Bool.Val);
+  O^.Idx.Val := -1;
   O^.Idx.Null := False;
+  if I^.Self.Null then
+    Exit;
+  if I^.Bool.Null then
+    O^.Idx.Val :=
+      TlkJSONlist(NativeIntPtr(TjsPtr(I^.Self.Ptr))).Add(TlkJSONnull.Generate())
+  else
+    O^.Idx.Val :=
+      TlkJSONlist(NativeIntPtr(TjsPtr(I^.Self.Ptr))).Add(I^.Bool.Val);
 end;
 
 procedure TjsListAddDouble.execute
@@ -1997,12 +2051,16 @@ var
 begin
   I := PjsInListAddDouble(AInMsg);
   O := PjsOutListAddDouble(AOutMsg);
-  O^.Idx.Null := True;
-  if I^.Self.Null or I^.Dbl.Null then
-    Exit;
-  O^.Idx.Val :=
-    TlkJSONlist(NativeIntPtr(TjsPtr(I^.Self.Ptr))).Add(I^.Dbl.Val);
+  O^.Idx.Val := -1;
   O^.Idx.Null := False;
+  if I^.Self.Null then
+    Exit;
+  if I^.Dbl.Null then
+    O^.Idx.Val :=
+      TlkJSONlist(NativeIntPtr(TjsPtr(I^.Self.Ptr))).Add(TlkJSONnull.Generate())
+  else
+    O^.Idx.Val :=
+      TlkJSONlist(NativeIntPtr(TjsPtr(I^.Self.Ptr))).Add(I^.Dbl.Val);
 end;
 
 procedure TjsListAddInteger.execute
@@ -2013,12 +2071,16 @@ var
 begin
   I := PjsInListAddInteger(AInMsg);
   O := PjsOutListAddInteger(AOutMsg);
-  O^.Idx.Null := True;
-  if I^.Self.Null or I^.Int.Null then
-    Exit;
-  O^.Idx.Val :=
-    TlkJSONlist(NativeIntPtr(TjsPtr(I^.Self.Ptr))).Add(I^.Int.Val);
+  O^.Idx.Val := -1;
   O^.Idx.Null := False;
+  if I^.Self.Null then
+    Exit;
+  if I^.Int.Null then
+    O^.Idx.Val :=
+      TlkJSONlist(NativeIntPtr(TjsPtr(I^.Self.Ptr))).Add(TlkJSONnull.Generate())
+  else
+    O^.Idx.Val :=
+      TlkJSONlist(NativeIntPtr(TjsPtr(I^.Self.Ptr))).Add(I^.Int.Val);
 end;
 
 procedure TjsListAddString.execute
@@ -2029,12 +2091,16 @@ var
 begin
   I := PjsInListAddString(AInMsg);
   O := PjsOutListAddString(AOutMsg);
-  O^.Idx.Null := True;
-  if I^.Self.Null or I^.Str.Null then
-    Exit;
-  O^.Idx.Val :=
-    TlkJSONlist(NativeIntPtr(TjsPtr(I^.Self.Ptr))).Add(String(I^.Str.Val));
+  O^.Idx.Val := -1;
   O^.Idx.Null := False;
+  if I^.Self.Null then
+    Exit;
+  if I^.Str.Null then
+    O^.Idx.Val :=
+      TlkJSONlist(NativeIntPtr(TjsPtr(I^.Self.Ptr))).Add(TlkJSONnull.Generate())
+  else
+    O^.Idx.Val :=
+      TlkJSONlist(NativeIntPtr(TjsPtr(I^.Self.Ptr))).Add(String(I^.Str.Val));
 end;
 
 procedure TjsListAddWideString.execute
@@ -2046,18 +2112,24 @@ var
 begin
   I := PjsInListAddWideString(AInMsg);
   O := PjsOutListAddWideString(AOutMsg);
-  O^.Idx.Null := True;
-  if I^.Self.Null or I^.WStr.Null then
+  O^.Idx.Val := -1;
+  O^.Idx.Null := False;
+  if I^.Self.Null then
     Exit;
-  Stream := TStringStream.Create;
-  try
-    ReadBlobToStream(TStream(Stream), AStatus, AContext, @(I^.WStr.Ptr));
+  if I^.WStr.Null then
     O^.Idx.Val :=
-      TlkJSONlist(NativeIntPtr(TjsPtr(I^.Self.Ptr))).
-        Add(WideString(Stream.DataString));
-    O^.Idx.Null := False;
-  finally
-    Stream.Free;
+      TlkJSONlist(NativeIntPtr(TjsPtr(I^.Self.Ptr))).Add(TlkJSONnull.Generate())
+  else
+  begin
+    Stream := TStringStream.Create;
+    try
+      ReadBlobToStream(TStream(Stream), AStatus, AContext, @(I^.WStr.Ptr));
+      O^.Idx.Val :=
+        TlkJSONlist(NativeIntPtr(TjsPtr(I^.Self.Ptr))).
+          Add(WideString(Stream.DataString));
+    finally
+      Stream.Free;
+    end;
   end;
 end;
 
@@ -2069,15 +2141,15 @@ var
 begin
   I := PjsInListDelete(AInMsg);
   O := PjsOutListDelete(AOutMsg);
-  O^.Res.Null := True;
+  O^.Res.Val := 1; // err
+  O^.Res.Null := False;
   if I^.Self.Null or I^.Idx.Null then
     Exit;
-  O^.Res.Null := False;
   try
     TlkJSONlist(NativeIntPtr(TjsPtr(I^.Self.Ptr))).Delete(I^.Idx.Val);
     O^.Res.Val := 0; // sucess
   except
-    O^.Res.Val := 1; // err
+    raise;
   end;
 end;
 
@@ -2117,6 +2189,7 @@ begin
     O^.Obj.Null := False;
   except
     O^.Obj.Null := True;
+    raise;
   end;
 end;
 
@@ -2161,6 +2234,7 @@ procedure TjsCustomListGetBoolean.execute
 var
   I: PjsInCustomListGet;
   O: PjsOutCustomListGetBoolean;
+  B: Boolean = False;
 begin
   I := PjsInCustomListGet(AInMsg);
   O := PjsOutCustomListGetBoolean(AOutMsg);
@@ -2168,8 +2242,9 @@ begin
   if I^.Self.Null or I^.Idx.Null then
     Exit;
   O^.Bool.Val :=
-    TlkJSONcustomlist(NativeIntPtr(TjsPtr(I^.Self.Ptr))).getBoolean(I^.Idx.Val);
-  O^.Bool.Null := False;
+    TlkJSONcustomlist(NativeIntPtr(TjsPtr(I^.Self.Ptr))).
+      getBoolean(I^.Idx.Val{$IFDEF NULL_SQL}, B{$ENDIF});
+  O^.Bool.Null := B;
 end;
 
 procedure TjsCustomListGetDouble.execute
@@ -2177,6 +2252,7 @@ procedure TjsCustomListGetDouble.execute
 var
   I: PjsInCustomListGet;
   O: PjsOutCustomListGetDouble;
+  B: Boolean = False;
 begin
   I := PjsInCustomListGet(AInMsg);
   O := PjsOutCustomListGetDouble(AOutMsg);
@@ -2184,8 +2260,9 @@ begin
   if I^.Self.Null or I^.Idx.Null then
     Exit;
   O^.Dbl.Val :=
-    TlkJSONcustomlist(NativeIntPtr(TjsPtr(I^.Self.Ptr))).getDouble(I^.Idx.Val);
-  O^.Dbl.Null := False;
+    TlkJSONcustomlist(NativeIntPtr(TjsPtr(I^.Self.Ptr))).
+      getDouble(I^.Idx.Val{$IFDEF NULL_SQL}, B{$ENDIF});
+  O^.Dbl.Null := B;
 end;
 
 procedure TjsCustomListGetInteger.execute
@@ -2193,6 +2270,7 @@ procedure TjsCustomListGetInteger.execute
 var
   I: PjsInCustomListGet;
   O: PjsOutCustomListGetInteger;
+  B: Boolean = False;
 begin
   I := PjsInCustomListGet(AInMsg);
   O := PjsOutCustomListGetInteger(AOutMsg);
@@ -2200,8 +2278,9 @@ begin
   if I^.Self.Null or I^.Idx.Null then
     Exit;
   O^.Int.Val :=
-    TlkJSONcustomlist(NativeIntPtr(TjsPtr(I^.Self.Ptr))).getInt(I^.Idx.Val);
-  O^.Int.Null := False;
+    TlkJSONcustomlist(NativeIntPtr(TjsPtr(I^.Self.Ptr))).
+      getInt(I^.Idx.Val{$IFDEF NULL_SQL}, B{$ENDIF});
+  O^.Int.Null := B;
 end;
 
 procedure TjsCustomListGetString.execute
@@ -2210,6 +2289,7 @@ var
   I: PjsInCustomListGet;
   O: PjsOutCustomListGetString;
   S: String;
+  B: Boolean = False;
 begin
   I := PjsInCustomListGet(AInMsg);
   O := PjsOutCustomListGetString(AOutMsg);
@@ -2217,10 +2297,11 @@ begin
   if I^.Self.Null or I^.Idx.Null then
     Exit;
   S :=
-    TlkJSONcustomlist(NativeIntPtr(TjsPtr(I^.Self.Ptr))).getString(I^.Idx.Val);
+    TlkJSONcustomlist(NativeIntPtr(TjsPtr(I^.Self.Ptr))).
+      getString(I^.Idx.Val{$IFDEF NULL_SQL}, B{$ENDIF});
   O^.Str.Len := Length(S);
   O^.Str.Val := S;
-  O^.Str.Null := False;
+  O^.Str.Null := B;
 end;
 
 procedure TjsCustomListGetWideString.execute
@@ -2229,6 +2310,7 @@ var
   I: PjsInCustomListGet;
   O: PjsOutCustomListGetWideString;
   Stream: TStringStream;
+  B: Boolean = False;
 begin
   I := PjsInCustomListGet(AInMsg);
   O := PjsOutCustomListGetWideString(AOutMsg);
@@ -2238,10 +2320,11 @@ begin
   Stream := TStringStream.Create;
   try
     Stream.WriteUnicodeString(
-       TlkJSONcustomlist(NativeIntPtr(TjsPtr(I^.Self.Ptr))).getWideString(I^.Idx.Val)
+       TlkJSONcustomlist(NativeIntPtr(TjsPtr(I^.Self.Ptr))).
+         getWideString(I^.Idx.Val{$IFDEF NULL_SQL}, B{$ENDIF})
       );
     WriteStreamToBlob(TStream(Stream), AStatus, AContext, @(O^.WStr.Ptr));
-    O^.WStr.Null := False;
+    O^.WStr.Null := B;
   finally
     Stream.Free;
   end;
@@ -2257,18 +2340,16 @@ var
 begin
   I := PjsInBaseDispose(AInMsg);
   O := PjsOutBaseDispose(AOutMsg);
+  O^.Res.Val := 1; // err
+  O^.Res.Null := False;
   if I^.Self.Null then
-  begin
-    O^.Res.Null := True;
     Exit;
-  end;
   try
     TlkJSONbase(NativeIntPtr(TjsPtr(I^.Self.Ptr))).Free;
     O^.Res.Val := 0; // sucess
   except
-    O^.Res.Val := 1; // err
+    raise;
   end;
-  O^.Res.Null := False;
 end;
 
 procedure TjsBaseField.execute
@@ -2505,6 +2586,7 @@ begin
     O^.Null := False;
   except
     O^.Null := True;
+    raise;
   end;
 end;
 
@@ -2584,6 +2666,7 @@ begin
     O^.Null := False;
   except
     O^.Null := True;
+    raise;
   end;
 end;
 
@@ -2655,6 +2738,7 @@ begin
     O^.Null := False;
   except
     O^.Null := True;
+    raise;
   end;
 end;
 
@@ -2691,6 +2775,7 @@ begin
     O^.Null := False;
   except
     O^.Null := True;
+    raise;
   end;
 end;
 
@@ -2763,6 +2848,7 @@ begin
     O^.Null := False;
   except
     O^.Null := True;
+    raise;
   end;
 end;
 
@@ -2945,4 +3031,3 @@ begin
 end;
 
 end.
-
