@@ -32,7 +32,8 @@
   changes:
 
   v1.07 23/11/2020 * changed lkJSON source code for Firebird UDR-engine
-                   + add conv params for disable UTF8 conversion
+                   + enabled Conv params for disable UTF8 conversion
+                   + added NULL_SQL directive for PSQL integration
                    * other improve & fix
   v1.07 06/11/2009 * fixed a bug in js_string - thanks to Andrew G. Khodotov
                    * fixed error with Double-slashes - thanks to anonymous user
@@ -151,7 +152,7 @@ unit uLkJSON;
 {$ELSE}
   {$IF RTLVersion > 14.00}
     {$DEFINE HAVE_FORMATSETTING}
-    {$IF RTLVersion > 19.00}
+    {$IF RTLVersion > 19.00}                            null Value
       {$DEFINE USE_D2009}
     {$IFEND}
     {$H+}
@@ -281,11 +282,11 @@ type
     procedure AfterConstruction; override;
     procedure BeforeDestruction; override;
 
-    function getInt(Idx: Integer): Integer; virtual;
-    function getString(Idx: Integer): String; virtual;
-    function getWideString(Idx: Integer): WideString; virtual;
-    function getDouble(Idx: Integer): Double; virtual;
-    function getBoolean(Idx: Integer): Boolean; virtual;
+    function getInt(Idx: Integer{$IFDEF NULL_SQL}; var Null: Boolean{$ENDIF}): Integer; virtual;
+    function getString(Idx: Integer{$IFDEF NULL_SQL}; var Null: Boolean{$ENDIF}): String; virtual;
+    function getWideString(Idx: Integer{$IFDEF NULL_SQL}; var Null: Boolean{$ENDIF}): WideString; virtual;
+    function getDouble(Idx: Integer{$IFDEF NULL_SQL}; var Null: Boolean{$ENDIF}): Double; virtual;
+    function getBoolean(Idx: Integer{$IFDEF NULL_SQL}; var Null: Boolean{$ENDIF}): Boolean; virtual;
   end;
 
   TlkJSONlist = class(TlkJSONcustomlist)
@@ -448,22 +449,27 @@ type
       TlkJSONbase read GetFieldByIndex write SetFieldByIndex;
     property NameOf[Idx: Integer]: WideString read GetNameOf;
 
-    function getBoolean(Idx: Integer): Boolean; overload; override;
-    function getDouble(Idx: Integer): Double; overload; override;
-    function getInt(Idx: Integer): Integer; overload; override;
-    function getString(Idx: Integer): String; overload; override;
-    function getWideString(Idx: Integer): WideString; overload; override;
+    function getBoolean
+      (Idx: Integer{$IFDEF NULL_SQL}; var Null: Boolean{$ENDIF}): Boolean; overload; override;
+    function getDouble
+      (Idx: Integer{$IFDEF NULL_SQL}; var Null: Boolean{$ENDIF}): Double; overload; override;
+    function getInt
+      (Idx: Integer{$IFDEF NULL_SQL}; var Null: Boolean{$ENDIF}): Integer; overload; override;
+    function getString
+      (Idx: Integer{$IFDEF NULL_SQL}; var Null: Boolean{$ENDIF}): String; overload; override;
+    function getWideString
+      (Idx: Integer{$IFDEF NULL_SQL}; var Null: Boolean{$ENDIF}): WideString; overload; override;
 
-    function {$ifdef TCB_EXT}getBooleanFromName{$else}getBoolean{$endif}
-      (nm: String): Boolean; overload;
-    function {$ifdef TCB_EXT}getDoubleFromName{$else}getDouble{$endif}
-      (nm: String): Double; overload;
-    function {$ifdef TCB_EXT}getIntFromName{$else}getInt{$endif}
-      (nm: String): Integer; overload;
-    function {$ifdef TCB_EXT}getStringFromName{$else}getString{$endif}
-      (nm: String): String; overload;
-    function {$ifdef TCB_EXT}getWideStringFromName{$else}getWideString{$endif}
-      (nm: String): WideString; overload;
+    function {$IFDEF TCB_EXT}getBooleanFromName{$ELSE}getBoolean{$ENDIF}
+      (nm: String{$IFDEF NULL_SQL}; var Null: Boolean{$ENDIF}): Boolean; overload;
+    function {$IFDEF TCB_EXT}getDoubleFromName{$ELSE}getDouble{$ENDIF}
+      (nm: String{$IFDEF NULL_SQL}; var Null: Boolean{$ENDIF}): Double; overload;
+    function {$IFDEF TCB_EXT}getIntFromName{$ELSE}getInt{$ENDIF}
+      (nm: String{$IFDEF NULL_SQL}; var Null: Boolean{$ENDIF}): Integer; overload;
+    function {$IFDEF TCB_EXT}getStringFromName{$ELSE}getString{$ENDIF}
+      (nm: String{$IFDEF NULL_SQL}; var Null: Boolean{$ENDIF}): String; overload;
+    function {$IFDEF TCB_EXT}getWideStringFromName{$ELSE}getWideString{$ENDIF}
+      (nm: String{$IFDEF NULL_SQL}; var Null: Boolean{$ENDIF}): WideString; overload;
   end;
   PlkJSONobject = ^TlkJSONobject;
 
@@ -942,49 +948,124 @@ begin
   Result := GetChild(Idx);
 end;
 
-function TlkJSONcustomlist.getDouble(Idx: Integer): Double;
+function TlkJSONcustomlist.getDouble
+  (Idx: Integer{$IFDEF NULL_SQL}; var Null: Boolean{$ENDIF}): Double;
 var
-  jn: TlkJSONnumber;
+  jn: {$IFDEF NULL_SQL}TlkJSONbase{$ELSE}TlkJSONnumber{$ENDIF};
 begin
+{$IFDEF NULL_SQL}
+  jn := Child[Idx] as TlkJSONbase;
+  if not Assigned(jn) or (jn.SelfType = jsNull) then
+  begin
+    Result := 0;
+    Null := True;
+  end
+  else
+  begin
+    Result := TlkJSONnumber(jn).Value;
+    Null := False;
+  end;
+{$ELSE}
   jn := Child[Idx] as TlkJSONnumber;
   if not Assigned(jn) then Result := 0
   else Result := jn.Value;
+{$ENDIF}
 end;
 
-function TlkJSONcustomlist.getInt(Idx: Integer): Integer;
+function TlkJSONcustomlist.getInt
+  (Idx: Integer{$IFDEF NULL_SQL}; var Null: Boolean{$ENDIF}): Integer;
 var
-  jn: TlkJSONnumber;
+  jn: {$IFDEF NULL_SQL}TlkJSONbase{$ELSE}TlkJSONnumber{$ENDIF};
 begin
+{$IFDEF NULL_SQL}
+  jn := Child[Idx] as TlkJSONbase;
+  if not Assigned(jn) or (jn.SelfType = jsNull) then
+  begin
+    Result := 0;
+    Null := True;
+  end
+  else
+  begin
+    Result := Round(Int(TlkJSONnumber(jn).Value));
+    Null := False;
+  end;
+{$ELSE}
   jn := Child[Idx] as TlkJSONnumber;
   if not Assigned(jn) then Result := 0
-  else Result := round(int(jn.Value));
+  else Result := Round(Int(jn.Value));
+{$ENDIF}
 end;
 
-function TlkJSONcustomlist.getString(Idx: Integer): String;
+function TlkJSONcustomlist.getString
+  (Idx: Integer{$IFDEF NULL_SQL}; var Null: Boolean{$ENDIF}): String;
 var
-  js: TlkJSONstring;
+  js: {$IFDEF NULL_SQL}TlkJSONbase{$ELSE}TlkJSONstring{$ENDIF};
 begin
+{$IFDEF NULL_SQL}
+  js := Child[Idx] as TlkJSONbase;
+  if not Assigned(js) or (js.SelfType = jsNull) then
+  begin
+    Result := '';
+    Null := True;
+  end
+  else
+  begin
+    Result := VarToStr(TlkJSONstring(js).Value);
+    Null := False;
+  end;
+{$ELSE}
   js := Child[Idx] as TlkJSONstring;
   if not Assigned(js) then Result := ''
   else Result := VarToStr(js.Value);
+{$ENDIF}
 end;
 
-function TlkJSONcustomlist.getWideString(Idx: Integer): WideString;
+function TlkJSONcustomlist.getWideString
+  (Idx: Integer{$IFDEF NULL_SQL}; var Null: Boolean{$ENDIF}): WideString;
 var
-  js: TlkJSONstring;
+  js: {$IFDEF NULL_SQL}TlkJSONbase{$ELSE}TlkJSONstring{$ENDIF};
 begin
+{$IFDEF NULL_SQL}
+  js := Child[Idx] as TlkJSONbase;
+  if not Assigned(js) or (js.SelfType = jsNull) then
+  begin
+    Result := '';
+    Null := True;
+  end
+  else
+  begin
+    Result := VarToWideStr(TlkJSONstring(js).Value);
+    Null := False;
+  end;
+{$ELSE}
   js := Child[Idx] as TlkJSONstring;
   if not Assigned(js) then Result := ''
   else Result := VarToWideStr(js.Value);
+{$ENDIF}
 end;
 
-function TlkJSONcustomlist.getBoolean(Idx: Integer): Boolean;
+function TlkJSONcustomlist.getBoolean
+  (Idx: Integer{$IFDEF NULL_SQL}; var Null: Boolean{$ENDIF}): Boolean;
 var
-  jb: TlkJSONboolean;
+  jb: {$IFDEF NULL_SQL}TlkJSONbase{$ELSE}TlkJSONboolean{$ENDIF};
 begin
+{$IFDEF NULL_SQL}
+  jb := Child[Idx] as TlkJSONbase;
+  if not Assigned(jb) or (jb.SelfType = jsNull) then
+  begin
+    Result := False;
+    Null := True;
+  end
+  else
+  begin
+    Result := TlkJSONboolean(jb).Value;
+    Null := False;
+  end;
+{$ELSE}
   jb := Child[Idx] as TlkJSONboolean;
   if not Assigned(jb) then Result := False
   else Result := jb.Value;
+{$ENDIF}
 end;
 
 { TlkJSONobjectmethod }
@@ -1307,8 +1388,7 @@ end;
 function TlkJSONobject.GetField(aName: Variant):TlkJSONbase;
 begin
   if VarIsStr(aName) then
-    Result := OldGetField(VarToWideStr(aName))
-  else
+    Result := OldGetField(VarToWideStr(aName)) else
     Result := inherited GetField(aName);
 end;
 
@@ -1339,95 +1419,179 @@ begin
   inherited;
 end;
 
-function TlkJSONobject.getDouble(Idx: Integer): Double;
+function TlkJSONobject.getDouble
+  (Idx: Integer{$IFDEF NULL_SQL}; var Null: Boolean{$ENDIF}): Double;
 var
-  jn: TlkJSONnumber;
+  jn: {$IFDEF NULL_SQL}TlkJSONbase{$ELSE}TlkJSONnumber{$ENDIF};
 begin
+{$IFDEF NULL_SQL}
+  jn := FieldByIndex[Idx] as TlkJSONbase;
+  if not Assigned(jn) or (jn.SelfType = jsNull) then
+  begin
+    Result := 0;
+    Null := True;
+  end
+  else
+  begin
+    Result := TlkJSONnumber(jn).Value;
+    Null := False;
+  end;
+{$ELSE}
   jn := FieldByIndex[Idx] as TlkJSONnumber;
   if not Assigned(jn) then Result := 0
   else Result := jn.Value;
+{$ENDIF}
 end;
 
-function TlkJSONobject.getInt(Idx: Integer): Integer;
+function TlkJSONobject.getInt
+  (Idx: Integer{$IFDEF NULL_SQL}; var Null: Boolean{$ENDIF}): Integer;
 var
-  jn: TlkJSONnumber;
+  jn: {$IFDEF NULL_SQL}TlkJSONbase{$ELSE}TlkJSONnumber{$ENDIF};
 begin
+{$IFDEF NULL_SQL}
+  jn := FieldByIndex[Idx] as TlkJSONbase;
+  if not Assigned(jn) or (jn.SelfType = jsNull) then
+  begin
+    Result := 0;
+    Null := True;
+  end
+  else
+  begin
+    Result := Round(Int(TlkJSONnumber(jn).Value));
+    Null := False;
+  end;
+{$ELSE}
   jn := FieldByIndex[Idx] as TlkJSONnumber;
   if not Assigned(jn) then Result := 0
-  else Result := round(int(jn.Value));
+  else Result := Round(Int(jn.Value));
+{$ENDIF}
 end;
 
-function TlkJSONobject.getString(Idx: Integer): String;
+function TlkJSONobject.getString
+  (Idx: Integer{$IFDEF NULL_SQL}; var Null: Boolean{$ENDIF}): String;
 var
-  js: TlkJSONstring;
+  js: {$IFDEF NULL_SQL}TlkJSONbase{$ELSE}TlkJSONstring{$ENDIF};
 begin
+{$IFDEF NULL_SQL}
+  js := FieldByIndex[Idx] as TlkJSONbase;
+  if not Assigned(js) or (js.SelfType = jsNull) then
+  begin
+    Result := '';
+    Null := True;
+  end
+  else
+  begin
+    Result := VarToStr(TlkJSONstring(js).Value);
+    Null := False;
+  end;
+{$ELSE}
   js := FieldByIndex[Idx] as TlkJSONstring;
   if not Assigned(js) then Result := ''
-  else Result := vartostr(js.Value);
+  else Result := VarToStr(js.Value);
+{$ENDIF}
 end;
 
-function TlkJSONobject.getWideString(Idx: Integer): WideString;
+function TlkJSONobject.getWideString
+  (Idx: Integer{$IFDEF NULL_SQL}; var Null: Boolean{$ENDIF}): WideString;
 var
-  js: TlkJSONstring;
+  js: {$IFDEF NULL_SQL}TlkJSONbase{$ELSE}TlkJSONstring{$ENDIF};
 begin
+{$IFDEF NULL_SQL}
+  js := FieldByIndex[Idx] as TlkJSONbase;
+  if not Assigned(js) or (js.SelfType = jsNull) then
+  begin
+    Result := '';
+    Null := True;
+  end
+  else
+  begin
+    Result := VarToWideStr(TlkJSONstring(js).Value);
+    Null := False;
+  end;
+{$ELSE}
   js := FieldByIndex[Idx] as TlkJSONstring;
   if not Assigned(js) then Result := ''
   else Result := VarToWideStr(js.Value);
+{$ENDIF}
 end;
 
-{$ifdef TCB_EXT}
-function TlkJSONobject.getDoubleFromName(nm: String): Double;
-{$else}
-function TlkJSONobject.getDouble(nm: String): Double;
-{$endif}
+{$IFDEF TCB_EXT}
+function TlkJSONobject.getDoubleFromName
+  (nm: String{$IFDEF NULL_SQL}; var Null: Boolean{$ENDIF}): Double;
+{$ELSE}
+function TlkJSONobject.getDouble
+  (nm: String{$IFDEF NULL_SQL}; var Null: Boolean{$ENDIF}): Double;
+{$ENDIF}
 begin
-  Result := getDouble(IndexOfName(WideString(nm)));
+  Result := getDouble(IndexOfName(WideString(nm)){$IFDEF NULL_SQL}, Null{$ENDIF});
 end;
 
-{$ifdef TCB_EXT}
-function TlkJSONobject.getIntFromName(nm: String): Integer;
-{$else}
-function TlkJSONobject.getInt(nm: String): Integer;
-{$endif}
+{$IFDEF TCB_EXT}
+function TlkJSONobject.getIntFromName
+  (nm: String{$IFDEF NULL_SQL}; var Null: Boolean{$ENDIF}): Integer;
+{$ELSE}
+function TlkJSONobject.getInt
+  (nm: String{$IFDEF NULL_SQL}; var Null: Boolean{$ENDIF}): Integer;
+{$ENDIF}
 begin
-  Result := getInt(IndexOfName(WideString(nm)));
+  Result := getInt(IndexOfName(WideString(nm)){$IFDEF NULL_SQL}, Null{$ENDIF});
 end;
 
-{$ifdef TCB_EXT}
-function TlkJSONobject.getStringFromName(nm: String): String;
-{$else}
-function TlkJSONobject.getString(nm: String): String;
-{$endif}
+{$IFDEF TCB_EXT}
+function TlkJSONobject.getStringFromName
+  (nm: String{$IFDEF NULL_SQL}; var Null: Boolean{$ENDIF}): String;
+{$ELSE}
+function TlkJSONobject.getString
+  (nm: String{$IFDEF NULL_SQL}; var Null: Boolean{$ENDIF}): String;
+{$ENDIF}
 begin
-  Result := getString(IndexOfName(WideString(nm)));
+  Result := getString(IndexOfName(WideString(nm)){$IFDEF NULL_SQL}, Null{$ENDIF});
 end;
 
-{$ifdef TCB_EXT}
-function TlkJSONobject.getWideStringFromName(nm: String): WideString;
-{$else}
-function TlkJSONobject.getWideString(nm: String): WideString;
-{$endif}
+{$IFDEF TCB_EXT}
+function TlkJSONobject.getWideStringFromName
+  (nm: String{$IFDEF NULL_SQL}; var Null: Boolean{$ENDIF}): WideString;
+{$ELSE}
+function TlkJSONobject.getWideString
+  (nm: String{$IFDEF NULL_SQL}; var Null: Boolean{$ENDIF}): WideString;
+{$ENDIF}
 begin
-  Result := getWideString(IndexOfName(WideString(nm)));
+  Result := getWideString(IndexOfName(WideString(nm)){$IFDEF NULL_SQL}, Null{$ENDIF});
 end;
 
-function TlkJSONobject.getBoolean(Idx: Integer): Boolean;
+function TlkJSONobject.getBoolean
+  (Idx: Integer {$IFDEF NULL_SQL}; var Null: Boolean{$ENDIF}): Boolean;
 var
-  jb: TlkJSONboolean;
+  jb: {$IFDEF NULL_SQL}TlkJSONbase{$ELSE}TlkJSONBoolean{$ENDIF};
 begin
+{$IFDEF NULL_SQL}
+  jb := FieldByIndex[Idx] as TlkJSONbase;
+  if not Assigned(jb) or (jb.SelfType = jsNull) then
+  begin
+    Result := False;
+    Null := True;
+  end
+  else
+  begin
+    Result := TlkJSONboolean(jb).Value;
+    Null := False;
+  end;
+{$ELSE}
   jb := FieldByIndex[Idx] as TlkJSONboolean;
-  if not Assigned(jb) then
-    Result := False else
-    Result := jb.Value;
+  if not Assigned(jb) then Result := false
+  else Result := jb.Value;
+{$ENDIF}
 end;
 
-{$ifdef TCB_EXT}
-function TlkJSONobject.getBooleanFromName(nm: String): Boolean;
-{$else}
-function TlkJSONobject.getBoolean(nm: String): Boolean;
-{$endif}
+{$IFDEF TCB_EXT}
+function TlkJSONobject.getBooleanFromName
+  (nm: String{$IFDEF NULL_SQL}; var Null: Boolean{$ENDIF}): Boolean;
+{$ELSE}
+function TlkJSONobject.getBoolean
+  (nm: String{$IFDEF NULL_SQL}; var Null: Boolean{$ENDIF}): Boolean;
+{$ENDIF}
 begin
-  Result := getBoolean(IndexOfName(WideString(nm)));
+  Result := getBoolean(IndexOfName(WideString(nm)){$IFDEF NULL_SQL}, Null{$ENDIF});
 end;
 
 { TlkJSON }
@@ -2701,4 +2865,3 @@ initialization
 {$ENDIF THREADSAFE}
 
 end.
-
