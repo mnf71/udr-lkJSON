@@ -20,7 +20,7 @@
       <AutoIncrementBuild Value="True"/>
       <MajorVersionNr Value="1"/>
       <RevisionNr Value="1"/>
-      <BuildNr Value="92"/>
+      <BuildNr Value="94"/>
       <Language Value="0419"/>
     </VersionInfo>
     <BuildModes Count="3">
@@ -68,7 +68,8 @@
             </Options>
           </Linking>
           <Other>
-            <CustomOptions Value="-dGeneric"/>
+            <CustomOptions Value="-dGeneric
+-dNull_SQL"/>
             <OtherDefines Count="1">
               <Define0 Value="CROSS"/>
             </OtherDefines>
@@ -109,7 +110,8 @@
             </Options>
           </Linking>
           <Other>
-            <CustomOptions Value="-dGeneric"/>
+            <CustomOptions Value="-dGeneric
+-dNull_SQL"/>
             <OtherDefines Count="1">
               <Define0 Value="CROSS"/>
             </OtherDefines>
