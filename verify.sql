@@ -1,4 +1,4 @@
--- SELECT js$func.GenerateText(js$func.ParseText( -- BLOB
+-- SELECT js$func.GenerateText(js$func.ParseText( -- BLOB 
 -- SELECT js$func.GenerateString(js$func.ParseString( -- String
 '
 {
