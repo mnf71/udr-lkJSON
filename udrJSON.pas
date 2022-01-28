@@ -81,14 +81,14 @@ type
 
   Tjsvc32 = record
     Len: Word;
-    Val: array [0..31] of AnsiChar;
+    Val: array [0..63] of AnsiChar;
     Null: WordBool;
   end;
   Pjsvc32 = ^Tjsvc32;
 
   Tjsvc128 = record
     Len: Word;
-    Val: array [0..127] of AnsiChar;
+    Val: array [0..255] of AnsiChar;
     Null: WordBool;
   end;
   Pjsvc128 = ^Tjsvc128;
@@ -192,6 +192,93 @@ type
   PjsOutObjectDispose = ^TjsOutObjectDispose;
 
   TjsObjectDispose = class(TjsFunction)
+    procedure execute
+      (AStatus: IStatus; AContext: IExternalContext; AInMsg, AOutMsg: Pointer);
+      override;
+  end;
+
+  TjsInObjectField = record
+    Self: TjsObj;
+    Name: Tjsvc128;
+    Obj: TjsObj;
+  end;
+  PjsInObjectField = ^TjsInObjectField;
+
+  TjsOutObjectField = record
+    Obj: TjsObj;
+  end;
+  PjsOutObjectField = ^TjsOutObjectField;
+
+  TjsObjectField = class(TjsFunction)
+    procedure execute
+      (AStatus: IStatus; AContext: IExternalContext; AInMsg, AOutMsg: Pointer);
+      override;
+  end;
+
+  TjsInObjectFieldByIndex = record
+    Self: TjsObj;
+    Idx: TjsInteger;
+    Obj: TjsObj;
+  end;
+  PjsInObjectFieldByIndex = ^TjsInObjectFieldByIndex;
+
+  TjsOutObjectFieldByIndex = record
+    Obj: TjsObj;
+  end;
+  PjsOutObjectFieldByIndex = ^TjsOutObjectFieldByIndex;
+
+  TjsObjectFieldByIndex = class(TjsFunction)
+    procedure execute
+      (AStatus: IStatus; AContext: IExternalContext; AInMsg, AOutMsg: Pointer);
+      override;
+  end;
+
+  TjsInObjectNameOf = record
+    Self: TjsObj;
+    Idx: TjsInteger;
+  end;
+  PjsInObjectNameOf = ^TjsInObjectNameOf;
+
+  TjsOutObjectNameOf = record
+    Name: Tjsvc128;
+  end;
+  PjsOutObjectNameOf = ^TjsOutObjectNameOf;
+
+  TjsObjectNameOf = class(TjsFunction)
+    procedure execute
+      (AStatus: IStatus; AContext: IExternalContext; AInMsg, AOutMsg: Pointer);
+      override;
+  end;
+
+  TjsInObjectIndexOfName = record
+    Self: TjsObj;
+    Name: Tjsvc128;
+  end;
+  PjsInObjectIndexOfName = ^TjsInObjectIndexOfName;
+
+  TjsOutObjectIndexOfName = record
+    Idx: TjsInteger;
+  end;
+  PjsOutObjectIndexOfName = ^TjsOutObjectIndexOfName;
+
+  TjsObjectIndexOfName = class(TjsFunction)
+    procedure execute
+      (AStatus: IStatus; AContext: IExternalContext; AInMsg, AOutMsg: Pointer);
+      override;
+  end;
+
+  TjsInObjectIndexOfObject = record
+    Self: TjsObj;
+    Obj: TjsObj;
+  end;
+  PjsInObjectIndexOfObject = ^TjsInObjectIndexOfObject;
+
+  TjsOutObjectIndexOfObject = record
+    Idx: TjsInteger;
+  end;
+  PjsOutObjectIndexOfObject = ^TjsOutObjectIndexOfObject;
+
+  TjsObjectIndexOfObject = class(TjsFunction)
     procedure execute
       (AStatus: IStatus; AContext: IExternalContext; AInMsg, AOutMsg: Pointer);
       override;
@@ -305,139 +392,6 @@ type
       override;
   end;
 
-  TjsInObjectDelete = record
-    Self: TjsObj;
-    Idx: TjsInteger;
-  end;
-  PjsInObjectDelete = ^TjsInObjectDelete;
-
-  TjsOutObjectDelete = record
-    Res: TjsSmallInt;
-  end;
-  PjsOutObjectDelete = ^TjsOutObjectDelete;
-
-  TjsObjectDelete = class(TjsFunction)
-    procedure execute
-      (AStatus: IStatus; AContext: IExternalContext; AInMsg, AOutMsg: Pointer);
-      override;
-  end;
-
-  TjsInObjectIndexOfName = record
-    Self: TjsObj;
-    Name: Tjsvc128;
-  end;
-  PjsInObjectIndexOfName = ^TjsInObjectIndexOfName;
-
-  TjsOutObjectIndexOfName = record
-    Idx: TjsInteger;
-  end;
-  PjsOutObjectIndexOfName = ^TjsOutObjectIndexOfName;
-
-  TjsObjectIndexOfName = class(TjsFunction)
-    procedure execute
-      (AStatus: IStatus; AContext: IExternalContext; AInMsg, AOutMsg: Pointer);
-      override;
-  end;
-
-  TjsInObjectIndexOfObject = record
-    Self: TjsObj;
-    Obj: TjsObj;
-  end;
-  PjsInObjectIndexOfObject = ^TjsInObjectIndexOfObject;
-
-  TjsOutObjectIndexOfObject = record
-    Idx: TjsInteger;
-  end;
-  PjsOutObjectIndexOfObject = ^TjsOutObjectIndexOfObject;
-
-  TjsObjectIndexOfObject = class(TjsFunction)
-    procedure execute
-      (AStatus: IStatus; AContext: IExternalContext; AInMsg, AOutMsg: Pointer);
-      override;
-  end;
-
-  TjsInObjectField = record
-    Self: TjsObj;
-    Name: Tjsvc128;
-    Obj: TjsObj;
-  end;
-  PjsInObjectField = ^TjsInObjectField;
-
-  TjsOutObjectField = record
-    Obj: TjsObj;
-  end;
-  PjsOutObjectField = ^TjsOutObjectField;
-
-  TjsObjectField = class(TjsFunction)
-    procedure execute
-      (AStatus: IStatus; AContext: IExternalContext; AInMsg, AOutMsg: Pointer);
-      override;
-  end;
-
-  TjsInObjectGenerate = record
-    Self: TjsObj;
-    UseHash: TjsBool;
-  end;
-  PjsInObjectGenerate = ^TjsInObjectGenerate;
-
-  TjsOutObjectGenerate = record
-    Obj: TjsObj;
-  end;
-  PjsOutObjectGenerate = ^TjsOutObjectGenerate;
-
-  TjsObjectGenerate = class(TjsFunction)
-    procedure execute
-      (AStatus: IStatus; AContext: IExternalContext; AInMsg, AOutMsg: Pointer);
-      override;
-  end;
-
-  TjsObjectSelfType = class(TjsFunction)
-    procedure execute
-      (AStatus: IStatus; AContext: IExternalContext; AInMsg, AOutMsg: Pointer);
-      override;
-  end;
-
-  TjsObjectSelfTypeName = class(TjsFunction)
-    procedure execute
-      (AStatus: IStatus; AContext: IExternalContext; AInMsg, AOutMsg: Pointer);
-      override;
-  end;
-
-  TjsInObjectFieldByIndex = record
-    Self: TjsObj;
-    Idx: TjsInteger;
-    Obj: TjsObj;
-  end;
-  PjsInObjectFieldByIndex = ^TjsInObjectFieldByIndex;
-
-  TjsOutObjectFieldByIndex = record
-    Obj: TjsObj;
-  end;
-  PjsOutObjectFieldByIndex = ^TjsOutObjectFieldByIndex;
-
-  TjsObjectFieldByIndex = class(TjsFunction)
-    procedure execute
-      (AStatus: IStatus; AContext: IExternalContext; AInMsg, AOutMsg: Pointer);
-      override;
-  end;
-
-  TjsInObjectNameOf = record
-    Self: TjsObj;
-    Idx: TjsInteger;
-  end;
-  PjsInObjectNameOf = ^TjsInObjectNameOf;
-
-  TjsOutObjectNameOf = record
-    Name: Tjsvc128;
-  end;
-  PjsOutObjectNameOf = ^TjsOutObjectNameOf;
-
-  TjsObjectNameOf = class(TjsFunction)
-    procedure execute
-      (AStatus: IStatus; AContext: IExternalContext; AInMsg, AOutMsg: Pointer);
-      override;
-  end;
-
   TjsInObjectGet = record
     Self: TjsObj;
     Idx: TjsInteger;
@@ -530,6 +484,52 @@ type
   end;
 
   TjsObjectGetWideStringByName = class(TjsFunction)
+    procedure execute
+      (AStatus: IStatus; AContext: IExternalContext; AInMsg, AOutMsg: Pointer);
+      override;
+  end;
+
+  TjsInObjectDelete = record
+    Self: TjsObj;
+    Idx: TjsInteger;
+  end;
+  PjsInObjectDelete = ^TjsInObjectDelete;
+
+  TjsOutObjectDelete = record
+    Res: TjsSmallInt;
+  end;
+  PjsOutObjectDelete = ^TjsOutObjectDelete;
+
+  TjsObjectDelete = class(TjsFunction)
+    procedure execute
+      (AStatus: IStatus; AContext: IExternalContext; AInMsg, AOutMsg: Pointer);
+      override;
+  end;
+
+  TjsInObjectGenerate = record
+    Self: TjsObj;
+    UseHash: TjsBool;
+  end;
+  PjsInObjectGenerate = ^TjsInObjectGenerate;
+
+  TjsOutObjectGenerate = record
+    Obj: TjsObj;
+  end;
+  PjsOutObjectGenerate = ^TjsOutObjectGenerate;
+
+  TjsObjectGenerate = class(TjsFunction)
+    procedure execute
+      (AStatus: IStatus; AContext: IExternalContext; AInMsg, AOutMsg: Pointer);
+      override;
+  end;
+
+  TjsObjectSelfType = class(TjsFunction)
+    procedure execute
+      (AStatus: IStatus; AContext: IExternalContext; AInMsg, AOutMsg: Pointer);
+      override;
+  end;
+
+  TjsObjectSelfTypeName = class(TjsFunction)
     procedure execute
       (AStatus: IStatus; AContext: IExternalContext; AInMsg, AOutMsg: Pointer);
       override;
@@ -858,6 +858,22 @@ type
   PjsOutBaseCount = ^TjsOutBaseCount;
 
   TjsBaseCount = class(TjsFunction)
+    procedure execute
+      (AStatus: IStatus; AContext: IExternalContext; AInMsg, AOutMsg: Pointer);
+      override;
+  end;
+
+  TjsInBaseParent = record
+    Self: TjsObj;
+  end;
+  PjsInBaseParent = ^TjsInBaseParent;
+
+  TjsOutBaseParent = record
+    Obj: TjsObj;
+  end;
+  PjsOutBaseParent = ^TjsOutBaseParent;
+
+  TjsBaseParent = class(TjsFunction)
     procedure execute
       (AStatus: IStatus; AContext: IExternalContext; AInMsg, AOutMsg: Pointer);
       override;
@@ -2401,6 +2417,28 @@ begin
   O^.Cnt.Val :=
     TlkJSONbase(NativeIntPtr(TjsPtr(I^.Self.Ptr))).Count;
   O^.Cnt.Null := False;
+end;
+
+procedure TjsBaseParent.execute
+  (AStatus: IStatus; AContext: IExternalContext; AInMsg, AOutMsg: Pointer);
+var
+  I: PjsInBaseParent;
+  O: PjsOutBaseParent;
+  P: Pointer;
+begin
+  I := PjsInBaseParent(AInMsg);;
+  O := PjsOutBaseParent(AOutMsg);
+  O^.Obj.Null := True;
+  if I^.Self.Null then
+    Exit;
+  P := NativeIntPtr(TlkJSONbase(NativeIntPtr(TjsPtr(I^.Self.Ptr))).Parent);
+  if P = Nil then
+    O^.Obj.Null := True
+  else
+  begin
+    O^.Obj.Ptr := TjsPtr(P);
+    O^.Obj.Null := False;
+  end;
 end;
 
 procedure TjsBaseChild.execute

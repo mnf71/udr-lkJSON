@@ -50,24 +50,19 @@ begin
   AUdrPlugin.registerFunction(AStatus, 'ObjectNew', {$IFNDEF GENERIC}{$ELSE}specialize{$ENDIF} TjsFunctionFactory<TjsObjectNew>.Create);
   AUdrPlugin.registerFunction(AStatus, 'ObjectDispose', {$IFNDEF GENERIC}{$ELSE}specialize{$ENDIF} TjsFunctionFactory<TjsObjectDispose>.Create);
 
+  AUdrPlugin.registerFunction(AStatus, 'ObjectField', {$IFNDEF GENERIC}{$ELSE}specialize{$ENDIF} TjsFunctionFactory<TjsObjectField>.Create);
+  AUdrPlugin.registerFunction(AStatus, 'ObjectFieldByIndex', {$IFNDEF GENERIC}{$ELSE}specialize{$ENDIF} TjsFunctionFactory<TjsObjectFieldByIndex>.Create);
+
+  AUdrPlugin.registerFunction(AStatus, 'ObjectNameOf', {$IFNDEF GENERIC}{$ELSE}specialize{$ENDIF} TjsFunctionFactory<TjsObjectNameOf>.Create);
+  AUdrPlugin.registerFunction(AStatus, 'ObjectIndexOfName', {$IFNDEF GENERIC}{$ELSE}specialize{$ENDIF} TjsFunctionFactory<TjsObjectIndexOfName>.Create);
+  AUdrPlugin.registerFunction(AStatus, 'ObjectIndexOfObject', {$IFNDEF GENERIC}{$ELSE}specialize{$ENDIF} TjsFunctionFactory<TjsObjectIndexOfObject>.Create);
+
   AUdrPlugin.registerFunction(AStatus, 'ObjectAdd', {$IFNDEF GENERIC}{$ELSE}specialize{$ENDIF} TjsFunctionFactory<TjsObjectAdd>.Create);
   AUdrPlugin.registerFunction(AStatus, 'ObjectAddBoolean', {$IFNDEF GENERIC}{$ELSE}specialize{$ENDIF} TjsFunctionFactory<TjsObjectAddBoolean>.Create);
   AUdrPlugin.registerFunction(AStatus, 'ObjectAddDouble', {$IFNDEF GENERIC}{$ELSE}specialize{$ENDIF} TjsFunctionFactory<TjsObjectAddDouble>.Create);
   AUdrPlugin.registerFunction(AStatus, 'ObjectAddInteger', {$IFNDEF GENERIC}{$ELSE}specialize{$ENDIF} TjsFunctionFactory<TjsObjectAddInteger>.Create);
   AUdrPlugin.registerFunction(AStatus, 'ObjectAddString', {$IFNDEF GENERIC}{$ELSE}specialize{$ENDIF} TjsFunctionFactory<TjsObjectAddString>.Create);
   AUdrPlugin.registerFunction(AStatus, 'ObjectAddWideString', {$IFNDEF GENERIC}{$ELSE}specialize{$ENDIF} TjsFunctionFactory<TjsObjectAddWideString>.Create);
-
-  AUdrPlugin.registerFunction(AStatus, 'ObjectDelete', {$IFNDEF GENERIC}{$ELSE}specialize{$ENDIF} TjsFunctionFactory<TjsObjectDelete>.Create);
-  AUdrPlugin.registerFunction(AStatus, 'ObjectIndexOfName', {$IFNDEF GENERIC}{$ELSE}specialize{$ENDIF} TjsFunctionFactory<TjsObjectIndexOfName>.Create);
-  AUdrPlugin.registerFunction(AStatus, 'ObjectIndexOfObject', {$IFNDEF GENERIC}{$ELSE}specialize{$ENDIF} TjsFunctionFactory<TjsObjectIndexOfObject>.Create);
-  AUdrPlugin.registerFunction(AStatus, 'ObjectField', {$IFNDEF GENERIC}{$ELSE}specialize{$ENDIF} TjsFunctionFactory<TjsObjectField>.Create);
-
-  AUdrPlugin.registerFunction(AStatus, 'ObjectGenerate', {$IFNDEF GENERIC}{$ELSE}specialize{$ENDIF} TjsFunctionFactory<TjsObjectGenerate>.Create);
-  AUdrPlugin.registerFunction(AStatus, 'ObjectSelfType', {$IFNDEF GENERIC}{$ELSE}specialize{$ENDIF} TjsFunctionFactory<TjsObjectSelfType>.Create);
-  AUdrPlugin.registerFunction(AStatus, 'ObjectSelfTypeName', {$IFNDEF GENERIC}{$ELSE}specialize{$ENDIF} TjsFunctionFactory<TjsObjectSelfTypeName>.Create);
-
-  AUdrPlugin.registerFunction(AStatus, 'ObjectFieldByIndex', {$IFNDEF GENERIC}{$ELSE}specialize{$ENDIF} TjsFunctionFactory<TjsObjectFieldByIndex>.Create);
-  AUdrPlugin.registerFunction(AStatus, 'ObjectNameOf', {$IFNDEF GENERIC}{$ELSE}specialize{$ENDIF} TjsFunctionFactory<TjsObjectNameOf>.Create);
 
   AUdrPlugin.registerFunction(AStatus, 'ObjectGetBoolean', {$IFNDEF GENERIC}{$ELSE}specialize{$ENDIF} TjsFunctionFactory<TjsObjectGetBoolean>.Create);
   AUdrPlugin.registerFunction(AStatus, 'ObjectGetDouble', {$IFNDEF GENERIC}{$ELSE}specialize{$ENDIF} TjsFunctionFactory<TjsObjectGetDouble>.Create);
@@ -81,6 +76,12 @@ begin
   AUdrPlugin.registerFunction(AStatus, 'ObjectGetStringByName', {$IFNDEF GENERIC}{$ELSE}specialize{$ENDIF} TjsFunctionFactory<TjsObjectGetStringByName>.Create);
   AUdrPlugin.registerFunction(AStatus, 'ObjectGetWideStringByName', {$IFNDEF GENERIC}{$ELSE}specialize{$ENDIF} TjsFunctionFactory<TjsObjectGetWideStringByName>.Create);
 
+  AUdrPlugin.registerFunction(AStatus, 'ObjectDelete', {$IFNDEF GENERIC}{$ELSE}specialize{$ENDIF} TjsFunctionFactory<TjsObjectDelete>.Create);
+
+  AUdrPlugin.registerFunction(AStatus, 'ObjectGenerate', {$IFNDEF GENERIC}{$ELSE}specialize{$ENDIF} TjsFunctionFactory<TjsObjectGenerate>.Create);
+  AUdrPlugin.registerFunction(AStatus, 'ObjectSelfType', {$IFNDEF GENERIC}{$ELSE}specialize{$ENDIF} TjsFunctionFactory<TjsObjectSelfType>.Create);
+  AUdrPlugin.registerFunction(AStatus, 'ObjectSelfTypeName', {$IFNDEF GENERIC}{$ELSE}specialize{$ENDIF} TjsFunctionFactory<TjsObjectSelfTypeName>.Create);
+
   { TlkJSONobjectmethod }
 
   AUdrPlugin.registerFunction(AStatus, 'ObjectMethodObjValue', {$IFNDEF GENERIC}{$ELSE}specialize{$ENDIF} TjsFunctionFactory<TjsObjectMethodObjValue>.Create);
@@ -88,6 +89,8 @@ begin
   AUdrPlugin.registerFunction(AStatus, 'ObjectMethodGenerate', {$IFNDEF GENERIC}{$ELSE}specialize{$ENDIF} TjsFunctionFactory<TjsObjectMethodGenerate>.Create);
 
   { TlkJSONlist }
+
+  AUdrPlugin.registerFunction(AStatus, 'ListIndexOfObject', {$IFNDEF GENERIC}{$ELSE}specialize{$ENDIF} TjsFunctionFactory<TjsListIndexOfObject>.Create);
 
   AUdrPlugin.registerFunction(AStatus, 'ListAdd', {$IFNDEF GENERIC}{$ELSE}specialize{$ENDIF} TjsFunctionFactory<TjsListAdd>.Create);
   AUdrPlugin.registerFunction(AStatus, 'ListAddBoolean', {$IFNDEF GENERIC}{$ELSE}specialize{$ENDIF} TjsFunctionFactory<TjsListAddBoolean>.Create);
@@ -97,7 +100,6 @@ begin
   AUdrPlugin.registerFunction(AStatus, 'ListAddWideString', {$IFNDEF GENERIC}{$ELSE}specialize{$ENDIF} TjsFunctionFactory<TjsListAddWideString>.Create);
 
   AUdrPlugin.registerFunction(AStatus, 'ListDelete', {$IFNDEF GENERIC}{$ELSE}specialize{$ENDIF} TjsFunctionFactory<TjsListDelete>.Create);
-  AUdrPlugin.registerFunction(AStatus, 'ListIndexOfObject', {$IFNDEF GENERIC}{$ELSE}specialize{$ENDIF} TjsFunctionFactory<TjsListIndexOfObject>.Create);
 
   AUdrPlugin.registerFunction(AStatus, 'ListGenerate', {$IFNDEF GENERIC}{$ELSE}specialize{$ENDIF} TjsFunctionFactory<TjsListGenerate>.Create);
   AUdrPlugin.registerFunction(AStatus, 'ListSelfType', {$IFNDEF GENERIC}{$ELSE}specialize{$ENDIF} TjsFunctionFactory<TjsListSelfType>.Create);
@@ -117,6 +119,7 @@ begin
 
   AUdrPlugin.registerFunction(AStatus, 'BaseField', {$IFNDEF GENERIC}{$ELSE}specialize{$ENDIF} TjsFunctionFactory<TjsBaseField>.Create);
   AUdrPlugin.registerFunction(AStatus, 'BaseCount', {$IFNDEF GENERIC}{$ELSE}specialize{$ENDIF} TjsFunctionFactory<TjsBaseCount>.Create);
+  AUdrPlugin.registerFunction(AStatus, 'BaseParent', {$IFNDEF GENERIC}{$ELSE}specialize{$ENDIF} TjsFunctionFactory<TjsBaseParent>.Create);
   AUdrPlugin.registerFunction(AStatus, 'BaseChild', {$IFNDEF GENERIC}{$ELSE}specialize{$ENDIF} TjsFunctionFactory<TjsBaseChild>.Create);
   AUdrPlugin.registerFunction(AStatus, 'BaseValue', {$IFNDEF GENERIC}{$ELSE}specialize{$ENDIF} TjsFunctionFactory<TjsBaseValue>.Create);
   AUdrPlugin.registerFunction(AStatus, 'BaseWideValue', {$IFNDEF GENERIC}{$ELSE}specialize{$ENDIF} TjsFunctionFactory<TjsBaseWideValue>.Create);
