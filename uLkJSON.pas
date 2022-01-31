@@ -201,7 +201,7 @@ type
     function GetCount: Integer; virtual;
 
     function GetParent(): TlkJSONbase; virtual;
-    procedure SetParent(const Obj: TlkJSONbase); virtual;
+    procedure SetParent(const pObj: TlkJSONbase); virtual;
 
     function GetChild(const Idx: Integer): TlkJSONbase; virtual;
     procedure SetChild(const Idx: Integer; const Obj: TlkJSONbase); virtual;
@@ -296,8 +296,6 @@ type
 
     function GetCount: Integer; override;
 
-    procedure SetParent(const Obj: TlkJSONbase); override;
-
     function GetChild(const Idx: Integer): TlkJSONbase; override;
     procedure SetChild(const Idx: Integer; const Obj: TlkJSONbase); override;
 
@@ -351,6 +349,7 @@ type
 
   protected
     procedure SetName(const objName: WideString);
+    procedure SetParent(const pObj: TlkJSONbase = Nil); override;
 
   public
     procedure AfterConstruction; override;
@@ -674,9 +673,9 @@ begin
   Result := FParentObj;
 end;
 
-procedure TlkJSONbase.SetParent(const Obj: TlkJSONbase);
+procedure TlkJSONbase.SetParent(const pObj: TlkJSONbase);
 begin
-  FParentObj := Obj;
+  FParentObj := pObj;
 end;
 
 function TlkJSONbase.GetChild(const Idx: Integer): TlkJSONbase;
@@ -874,13 +873,6 @@ begin
   Result := FList.Count;
 end;
 
-procedure TlkJSONcustomlist.SetParent(const Obj: TlkJSONbase);
-begin
-  if Obj is TlkJSONobjectmethod then
-    TlkJSONobjectmethod(Obj).FValue.SetParent(Obj);
-  Obj.SetParent(Self);
-end;
-
 function TlkJSONcustomlist.GetChild(const Idx: Integer): TlkJSONbase;
 begin
   if (Idx < 0) or (Idx >= Count) then
@@ -895,7 +887,7 @@ begin
     if FList.Items[Idx] <> Nil then
       TlkJSONbase(FList.Items[Idx]).Free;
     FList.Items[Idx] := Obj;
-    SetParent(Obj);
+    Obj.SetParent(Self);
   end;
 end;
 
@@ -907,7 +899,7 @@ begin
     Exit;
   end;
   Result := FList.Add(Obj);
-  SetParent(Obj);
+  Obj.SetParent(Self);
 end;
 
 procedure TlkJSONcustomlist._Delete(const Idx: Integer);
@@ -1163,12 +1155,19 @@ begin
   FName := objName;
 end;
 
+procedure TlkJSONobjectmethod.SetParent(const pObj: TlkJSONbase = Nil);
+begin
+  if Assigned(pObj) then inherited SetParent(pObj);
+  TlkJSONbase(FValue).SetParent(Self);
+end;
+
 class function TlkJSONobjectmethod.Generate(
   const objName: WideString; const Obj: TlkJSONbase): TlkJSONobjectmethod;
 begin
   Result := TlkJSONobjectmethod.Create;
   Result.FName := objName;
   Result.FValue := Obj;
+  Result.SetParent();
 end;
 
 { TlkJSONobject }
@@ -1269,7 +1268,7 @@ begin
   begin
     objMethod := TlkJSONobjectmethod(FList.Items[Idx]);
     objMethod.FValue := Obj;
-    SetParent(objMethod);
+    objMethod.SetParent();
   end;
 end;
 

@@ -2424,19 +2424,19 @@ procedure TjsBaseParent.execute
 var
   I: PjsInBaseParent;
   O: PjsOutBaseParent;
-  P: Pointer;
+  P: TlkJSONbase;
 begin
   I := PjsInBaseParent(AInMsg);;
   O := PjsOutBaseParent(AOutMsg);
   O^.Obj.Null := True;
   if I^.Self.Null then
     Exit;
-  P := NativeIntPtr(TlkJSONbase(NativeIntPtr(TjsPtr(I^.Self.Ptr))).Parent);
-  if P = Nil then
+  P := TlkJSONbase(NativeIntPtr(TjsPtr(I^.Self.Ptr))).Parent;
+  if not Assigned(P) then
     O^.Obj.Null := True
   else
   begin
-    O^.Obj.Ptr := TjsPtr(P);
+    O^.Obj.Ptr := TjsPtr(NativeIntPtr(P));
     O^.Obj.Null := False;
   end;
 end;
