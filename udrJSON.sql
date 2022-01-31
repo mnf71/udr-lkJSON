@@ -1,8 +1,11 @@
+
+CREATE DOMAIN TY$POINTER AS CHAR(8) CHARACTER SET OCTETS COLLATE OCTETS;
+
 /******************************************************************************/
 /***                            Package headers                             ***/
 /******************************************************************************/
 
-CREATE DOMAIN TY$POINTER AS CHAR(8) CHARACTER SET OCTETS COLLATE OCTETS;
+
 
 SET TERM ^ ;
 
@@ -20,12 +23,13 @@ BEGIN
       Self TY$POINTER,
       /* -- */ Name VARCHAR(256) CHARACTER SET NONE NOT NULL 
       -- utf8 Name VARCHAR(64) CHARACTER SET UTF8 NOT NULL
-    ) RETURNS TY$POINTER; /* js$Base, js$Meth (jsList, jsObject) */
+    ) RETURNS TY$POINTER; /* js$Base based, js$Meth object based */
 
   FUNCTION Count_(Self TY$POINTER) RETURNS INTEGER;
 
-  FUNCTION Parent(Self TY$POINTER) RETURNS TY$POINTER;
-  FUNCTION Child(Self TY$POINTER, Idx INTEGER NOT NULL, Obj TY$POINTER = NULL /* Get */) RETURNS TY$POINTER;
+  FUNCTION Parent(Self TY$POINTER) RETURNS TY$POINTER; /* js$Base list based, js$Meth object based */
+  FUNCTION Child(Self TY$POINTER, Idx INTEGER NOT NULL, Obj TY$POINTER = NULL /* Get */)
+    RETURNS TY$POINTER; /* js$Base list based, js$Meth object based */
 
   FUNCTION Value_(
       Self TY$POINTER,
@@ -74,7 +78,7 @@ BEGIN
       Self TY$POINTER,
       /* -- */ Name VARCHAR(256) CHARACTER SET NONE NOT NULL /* 0.. = Idx */
       -- utf8 Name VARCHAR(64) CHARACTER SET UTF8 NOT NULL /* 0.. = Idx */
-    ) RETURNS TY$POINTER; /* js$Meth */
+    ) RETURNS TY$POINTER;
   
   FUNCTION Count_(Self TY$POINTER) RETURNS INTEGER;
 
@@ -134,7 +138,7 @@ BEGIN
       Self TY$POINTER,
       /* -- */ Name VARCHAR(256) CHARACTER SET NONE NOT NULL /* 0.. = Idx */
       -- utf8 Name VARCHAR(64) CHARACTER SET UTF8 NOT NULL /* 0.. = Idx */
-    ) RETURNS TY$POINTER; /* js$Meth */
+    ) RETURNS TY$POINTER;
 
   FUNCTION IndexOfObject(Self TY$POINTER, Obj TY$POINTER NOT NULL) RETURNS INTEGER;
 
@@ -149,7 +153,7 @@ BEGIN
   FUNCTION AddInteger(Self TY$POINTER, Int_ INTEGER) RETURNS INTEGER;
   FUNCTION AddString(
       Self TY$POINTER,
-      /* -- */ Str VARCHAR(32765) CHARACTER SET NONE
+      /* -- */ Str VARCHAR(32765) -- CHARACTER SET NONE
       -- utf8 Str VARCHAR(8191) CHARACTER SET UTF8
     ) RETURNS INTEGER;
   FUNCTION AddWideString(Self TY$POINTER, WStr BLOB SUB_TYPE TEXT) RETURNS INTEGER;
@@ -181,7 +185,7 @@ BEGIN
   /* TlkJSONbase = class
      TlkJSONobjectmethod = class(TlkJSONbase)
   */
-  FUNCTION Parent(Self TY$POINTER) RETURNS TY$POINTER; /* always NULL, call ObjValue.Parent */
+  FUNCTION Parent(Self TY$POINTER) RETURNS TY$POINTER;
 
   FUNCTION MethodObjValue(Self TY$POINTER) RETURNS TY$POINTER;
   FUNCTION MethodName(
@@ -192,7 +196,7 @@ BEGIN
     -- utf8) RETURNS VARCHAR(64) CHARACTER SET UTF8;
 
   FUNCTION MethodGenerate(
-      Self TY$POINTER,
+      Self TY$POINTER /* NULL - class function */,
       /* -- */ Name VARCHAR(256) CHARACTER SET NONE NOT NULL,
       -- utf8 Name VARCHAR(64) CHARACTER SET UTF8 NOT NULL,
       Obj TY$POINTER NOT NULL /* js$Base */
@@ -701,7 +705,7 @@ BEGIN
 
   FUNCTION AddString(
       Self TY$POINTER,
-      /* -- */ Str VARCHAR(32765) CHARACTER SET NONE
+      /* -- */ Str VARCHAR(32765) --CHARACTER SET NONE
       -- utf8 Str VARCHAR(8191) CHARACTER SET UTF8
     ) RETURNS INTEGER
     EXTERNAL NAME 'lkjson!ListAddString'

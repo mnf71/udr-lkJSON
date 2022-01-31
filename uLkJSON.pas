@@ -169,7 +169,7 @@ unit uLkJSON;
 interface
 
 {$DEFINE NEW_STYLE_GENERATE}
-{.$DEFINE USE_HASH}
+{.$DEFINE USE_HASH} // old-style
 {.$DEFINE TCB_EXT}
 {.$DEFINE STREAM}
 
@@ -191,17 +191,17 @@ type
 
   TlkJSONbase = class{$IFDEF DOTNET}(TlkJSONdotnetclass){$ENDIF}
   private
-    FParent: TlkJSONbase;
+    FParentObj: TlkJSONbase;
 
   protected
-    procedure AfterConstruction; virtual;
+    procedure AfterConstruction; override;
 
     function GetField(const objName: Variant): TlkJSONbase; virtual;
 
     function GetCount: Integer; virtual;
 
-    function GetParent(): TlkJSONbase;
-    procedure SetParent(const Obj: TlkJSONbase);
+    function GetParent(): TlkJSONbase; virtual;
+    procedure SetParent(const Obj: TlkJSONbase); virtual;
 
     function GetChild(const Idx: Integer): TlkJSONbase; virtual;
     procedure SetChild(const Idx: Integer; const Obj: TlkJSONbase); virtual;
@@ -292,12 +292,11 @@ type
   protected
     FList: TList;
 
-    function GetField(const objName: Variant):TlkJSONbase; override;
+    function GetField(const objName: Variant): TlkJSONbase; override;
 
     function GetCount: Integer; override;
 
-    function GetParent(): TlkJSONbase; virtual;
-    procedure SetParent(const Obj: TlkJSONbase); virtual;
+    procedure SetParent(const Obj: TlkJSONbase); override;
 
     function GetChild(const Idx: Integer): TlkJSONbase; override;
     procedure SetChild(const Idx: Integer; const Obj: TlkJSONbase); override;
@@ -364,7 +363,7 @@ type
       : TlkJSONobjectmethod;
   end;
 
-{$IFDEF USE_HASH}
+{$IFDEF USE_HASH} // old-style
   PlkHashItem = ^TlkHashItem;
   TlkHashItem = packed record
     hash: Cardinal;
@@ -440,7 +439,7 @@ type
 
   TlkJSONobject = class(TlkJSONcustomlist)
   protected
-{$IFDEF USE_HASH}
+{$IFDEF USE_HASH} // old-style
     ht: TlkHashTable;
 {$ELSE}
     ht: TlkBalTree;
@@ -455,7 +454,7 @@ type
 
     function GetNameOf(const Idx: Integer): WideString;
 
-{$IFDEF USE_HASH}
+{$IFDEF USE_HASH} // old-style
     function GetHashTable: TlkHashTable;
 {$ELSE}
     function GetHashTable: TlkBalTree;
@@ -466,7 +465,7 @@ type
   public
     property UseHash: Boolean read FUseHash;
 
-{$IFDEF USE_HASH}
+{$IFDEF USE_HASH} // old-style
     property HashTable: TlkHashTable read GetHashTable;
 {$ELSE}
     property HashTable: TlkBalTree read GetHashTable;
@@ -478,7 +477,7 @@ type
     function OldGetField(const objName: WideString): TlkJSONbase;
     procedure OldSetField(const objName: WideString; const Obj: TlkJSONbase);
 
-    property Field[objName: WideString] : TlkJSONbase read OldGetField write OldSetField; default;
+    property Field[objName: WideString]: TlkJSONbase read OldGetField write OldSetField; default;
     property FieldByIndex[Idx: Integer]: TlkJSONbase read GetFieldByIndex write SetFieldByIndex;
 
     property NameOf[Idx: Integer]: WideString read GetNameOf;
@@ -657,7 +656,7 @@ end;
 procedure TlkJSONbase.AfterConstruction;
 begin
   inherited;
-  FParent := Nil;
+  FParentObj := Nil;
 end;
 
 function TlkJSONbase.GetField(const objName: Variant):TlkJSONbase;
@@ -672,12 +671,12 @@ end;
 
 function TlkJSONbase.GetParent(): TlkJSONbase;
 begin
-  Result := FParent;
+  Result := FParentObj;
 end;
 
 procedure TlkJSONbase.SetParent(const Obj: TlkJSONbase);
 begin
-  FParent := Obj;
+  FParentObj := Obj;
 end;
 
 function TlkJSONbase.GetChild(const Idx: Integer): TlkJSONbase;
@@ -857,7 +856,7 @@ begin
   inherited;
 end;
 
-function TlkJSONcustomlist.GetField(const objName: Variant):TlkJSONbase;
+function TlkJSONcustomlist.GetField(const objName: Variant): TlkJSONbase;
 var
   Idx: Integer;
 begin
@@ -875,14 +874,11 @@ begin
   Result := FList.Count;
 end;
 
-function TlkJSONcustomlist.GetParent(): TlkJSONbase;
-begin
-  Result := FParent;
-end;
-
 procedure TlkJSONcustomlist.SetParent(const Obj: TlkJSONbase);
 begin
-  FParent := Obj;
+  if Obj is TlkJSONobjectmethod then
+    TlkJSONobjectmethod(Obj).FValue.SetParent(Obj);
+  Obj.SetParent(Self);
 end;
 
 function TlkJSONcustomlist.GetChild(const Idx: Integer): TlkJSONbase;
@@ -899,6 +895,7 @@ begin
     if FList.Items[Idx] <> Nil then
       TlkJSONbase(FList.Items[Idx]).Free;
     FList.Items[Idx] := Obj;
+    SetParent(Obj);
   end;
 end;
 
@@ -909,15 +906,8 @@ begin
     Result := -1;
     Exit;
   end;
-  // Assign parent object pointer
-  if Obj is TlkJSONobjectmethod then
-  begin
-    TlkJSONobjectmethod(Obj).FValue.SetParent(Self);
-    Obj.SetParent(Nil); // Method does't have parent
-  end
-  else
-    Obj.SetParent(Self);
   Result := FList.Add(Obj);
+  SetParent(Obj);
 end;
 
 procedure TlkJSONcustomlist._Delete(const Idx: Integer);
@@ -1187,7 +1177,7 @@ constructor TlkJSONobject.Create(bUseHash: Boolean = True);
 begin
   inherited Create;
   FUseHash := bUseHash;
-{$IFDEF USE_HASH}
+{$IFDEF USE_HASH} // old-style
   ht := TlkHashTable.Create;
   ht.FParent := Self;
 {$ELSE}
@@ -1201,7 +1191,7 @@ begin
   inherited;
 end;
 
-function TlkJSONobject.GetField(const objName: Variant):TlkJSONbase;
+function TlkJSONobject.GetField(const objName: Variant): TlkJSONbase;
 begin
   if VarIsStr(objName) then
     Result := OldGetField(VarToWideStr(objName)) else
@@ -1246,7 +1236,7 @@ begin
   Result := GetFieldByIndex(Idx);
 end;
 
-{$IFDEF USE_HASH}
+{$IFDEF USE_HASH} // old-style
 function TlkJSONobject.GetHashTable: TlkHashTable;
 {$ELSE}
 function TlkJSONobject.GetHashTable: TlkBalTree;
@@ -1279,6 +1269,7 @@ begin
   begin
     objMethod := TlkJSONobjectmethod(FList.Items[Idx]);
     objMethod.FValue := Obj;
+    SetParent(objMethod);
   end;
 end;
 
@@ -1333,9 +1324,9 @@ begin
   objMethod := TlkJSONobjectmethod.Create;
   objMethod.FName := objName;
   objMethod.FValue := Obj;
-  Result := Self._Add(objMethod);
+  Result := _Add(objMethod);
   if FUseHash then
-{$IFDEF USE_HASH}
+{$IFDEF USE_HASH} // old-style
     ht.AddPair(objName, Result);
 {$ELSE}
     ht.Insert(objName, Result);
@@ -1556,7 +1547,7 @@ begin
     if FUseHash then ht.Delete(objMethod.FName);
   end;
   _Delete(Idx);
-{$IFDEF USE_HASH}
+{$IFDEF USE_HASH} // old-style
   if (Idx < Count) and (FUseHash) then
   begin
     objMethod := TlkJSONobjectmethod(FList.Items[Idx]);
@@ -1875,7 +1866,7 @@ var
       begin
         i := TlkJSONobject(o)._Add(c);
         if TlkJSONobject(o).UseHash then
-{$IFDEF USE_HASH}
+{$IFDEF USE_HASH} // old-style
           TlkJSONobject(o).ht.AddPair(TlkJSONobjectmethod(c).Name, i);
 {$ELSE}
           TlkJSONobject(o).ht.Insert(TlkJSONobjectmethod(c).Name, i);
@@ -2234,7 +2225,7 @@ end;
 
 { TlkHashTable }
 
-{$IFDEF USE_HASH}
+{$IFDEF USE_HASH} // old-style
 procedure TlkHashTable.AddPair(const ws: WideString; Idx: Integer);
 var
   i, j, k: Cardinal;
@@ -2734,7 +2725,7 @@ end;
 initialization
 
 {$IFNDEF THREADSAFE}
-  {$IFDEF USE_HASH}
+  {$IFDEF USE_HASH} // old-style
     init_rnd;
   {$ENDIF USE_HASH}
 {$ENDIF THREADSAFE}

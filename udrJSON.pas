@@ -79,19 +79,19 @@ type
   end;
   PjsDouble = ^TjsDouble;
 
-  Tjsvc32 = record
+  Tjsvc64 = record
     Len: Word;
     Val: array [0..63] of AnsiChar;
     Null: WordBool;
   end;
-  Pjsvc32 = ^Tjsvc32;
+  Pjsvc64 = ^Tjsvc64;
 
-  Tjsvc128 = record
+  Tjsvc256 = record
     Len: Word;
     Val: array [0..255] of AnsiChar;
     Null: WordBool;
   end;
-  Pjsvc128 = ^Tjsvc128;
+  Pjsvc256 = ^Tjsvc256;
 
   TjsvcX = record
     Len: Word;
@@ -112,7 +112,7 @@ type
   PjsSelfType = ^TjsSelfType;
 
   TjsSelfTypeName = record
-    SelfTypeName: Tjsvc32;
+    SelfTypeName: Tjsvc64;
   end;
   PjsSelfTypeName = ^TjsSelfTypeName;
 
@@ -199,7 +199,7 @@ type
 
   TjsInObjectField = record
     Self: TjsObj;
-    Name: Tjsvc128;
+    Name: Tjsvc256;
     Obj: TjsObj;
   end;
   PjsInObjectField = ^TjsInObjectField;
@@ -240,7 +240,7 @@ type
   PjsInObjectNameOf = ^TjsInObjectNameOf;
 
   TjsOutObjectNameOf = record
-    Name: Tjsvc128;
+    Name: Tjsvc256;
   end;
   PjsOutObjectNameOf = ^TjsOutObjectNameOf;
 
@@ -252,7 +252,7 @@ type
 
   TjsInObjectIndexOfName = record
     Self: TjsObj;
-    Name: Tjsvc128;
+    Name: Tjsvc256;
   end;
   PjsInObjectIndexOfName = ^TjsInObjectIndexOfName;
 
@@ -286,7 +286,7 @@ type
 
   TjsInObjectAdd = record
     Self: TjsObj;
-    Name: Tjsvc128;
+    Name: Tjsvc256;
     Obj: TjsObj;
   end;
   PjsInObjectAdd = ^TjsInObjectAdd;
@@ -304,7 +304,7 @@ type
 
   TjsInObjectAddBoolean = record
     Self: TjsObj;
-    Name: Tjsvc128;
+    Name: Tjsvc256;
     Bool: TjsBool;
   end;
   PjsInObjectAddBoolean = ^TjsInObjectAddBoolean;
@@ -322,7 +322,7 @@ type
 
   TjsInObjectAddDouble = record
     Self: TjsObj;
-    Name: Tjsvc128;
+    Name: Tjsvc256;
     Dbl: TjsDouble;
   end;
   PjsInObjectAddDouble = ^TjsInObjectAddDouble;
@@ -340,7 +340,7 @@ type
 
   TjsInObjectAddInteger = record
     Self: TjsObj;
-    Name: Tjsvc128;
+    Name: Tjsvc256;
     Int: TjsInteger;
   end;
   PjsInObjectAddInteger = ^TjsInObjectAddInteger;
@@ -358,7 +358,7 @@ type
 
   TjsInObjectAddString = record
     Self: TjsObj;
-    Name: Tjsvc128;
+    Name: Tjsvc256;
     Str: TjsvcX;
   end;
   PjsInObjectAddString = ^TjsInObjectAddString;
@@ -376,7 +376,7 @@ type
 
   TjsInObjectAddWideString = record
     Self: TjsObj;
-    Name: Tjsvc128;
+    Name: Tjsvc256;
     WStr: TjsWStr;
   end;
   PjsInObjectAddWideString = ^TjsInObjectAddWideString;
@@ -400,7 +400,7 @@ type
 
   TjsInObjectGetByName = record
     Self: TjsObj;
-    Name: Tjsvc128;
+    Name: Tjsvc256;
   end;
   PjsInObjectGetByName = ^TjsInObjectGetByName;
 
@@ -555,12 +555,12 @@ type
 
   TjsInObjectMethodName = record
     Self: TjsObj;
-    Name: Tjsvc128;
+    Name: Tjsvc256;
   end;
   PjsInObjectMethodName = ^TjsInObjectMethodName;
 
   TjsOutObjectMethodName = record
-    Name: Tjsvc128;
+    Name: Tjsvc256;
   end;
   PjsOutObjectMethodName = ^TjsOutObjectMethodName;
 
@@ -572,7 +572,7 @@ type
 
   TjsInObjectMethodGenerate = record
     Self: TjsObj;
-    Name: Tjsvc128;
+    Name: Tjsvc256;
     Obj: TjsObj;
   end;
   PjsInObjectMethodGenerate = ^TjsInObjectMethodGenerate;
@@ -837,7 +837,7 @@ type
 
   TjsInBaseField = record
     Self: TjsObj;
-    Name: Tjsvc128;
+    Name: Tjsvc256;
   end;
   PjsInBaseField = ^TjsInBaseField;
 
@@ -2674,11 +2674,11 @@ begin
   O^.Dbl.Null := True;
   if I^.Self.Null then Exit;
   if I^.Dbl.Null then
-    Dbl := TlkJSONboolean(NativeIntPtr(TjsPtr(I^.Self.Ptr))).Value
+    Dbl := TlkJSONNumber(NativeIntPtr(TjsPtr(I^.Self.Ptr))).Value
   else
   begin
     Dbl := I^.Dbl.Val;
-    TlkJSONboolean(NativeIntPtr(TjsPtr(I^.Self.Ptr))).Value := I^.Dbl.Val;
+    TlkJSONNumber(NativeIntPtr(TjsPtr(I^.Self.Ptr))).Value := I^.Dbl.Val;
   end;
   O^.Dbl.Val := Dbl;
   O^.Dbl.Null := False;
