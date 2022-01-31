@@ -3,7 +3,7 @@
   <ProjectSession>
     <PathDelim Value="\"/>
     <Version Value="11"/>
-    <BuildModes Count="1" Active="Release x64 cross">
+    <BuildModes Count="1" Active="Debug x64 win">
       <Item1 Name="Release x64 cross">
         <CompilerOptions>
           <Version Value="11"/>
@@ -58,23 +58,25 @@
         </ExtraEditor1>
         <UsageCount Value="223"/>
         <Loaded Value="True"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit0>
       <Unit1>
         <Filename Value="uLkJSON.pas"/>
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
-        <EditorIndex Value="2"/>
-        <TopLine Value="853"/>
-        <CursorPos X="165" Y="869"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="839"/>
+        <CursorPos X="36" Y="859"/>
         <ExtraEditorCount Value="1"/>
         <ExtraEditor1>
           <IsVisibleTab Value="True"/>
-          <WindowIndex Value="1"/>
-          <TopLine Value="839"/>
-          <CursorPos X="36" Y="859"/>
+          <EditorIndex Value="2"/>
+          <TopLine Value="853"/>
+          <CursorPos X="68" Y="865"/>
         </ExtraEditor1>
         <UsageCount Value="223"/>
         <Loaded Value="True"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit1>
       <Unit2>
         <Filename Value="udrJSON.pas"/>
@@ -91,6 +93,7 @@
         </ExtraEditor1>
         <UsageCount Value="223"/>
         <Loaded Value="True"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit2>
       <Unit3>
         <Filename Value="firebird\Firebird.pas"/>
@@ -99,6 +102,7 @@
         <TopLine Value="10415"/>
         <CursorPos Y="10435"/>
         <UsageCount Value="253"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit3>
       <Unit4>
         <Filename Value="simden\UdrFactories.pas"/>
@@ -107,6 +111,7 @@
         <TopLine Value="170"/>
         <CursorPos X="35" Y="186"/>
         <UsageCount Value="220"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit4>
       <Unit5>
         <Filename Value="common\UdrFactories.pas"/>
@@ -114,6 +119,7 @@
         <TopLine Value="13"/>
         <CursorPos X="42" Y="35"/>
         <UsageCount Value="174"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit5>
       <Unit6>
         <Filename Value="common\Firebird.pas"/>
@@ -121,11 +127,15 @@
         <TopLine Value="5156"/>
         <CursorPos X="37" Y="5163"/>
         <UsageCount Value="172"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit6>
     </Units>
     <OtherDefines Count="1">
       <Define0 Value="CROSS"/>
     </OtherDefines>
+    <General>
+      <ActiveWindowIndexAtStart Value="1"/>
+    </General>
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
         <Filename Value="uLkJSON.pas"/>
