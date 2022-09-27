@@ -1542,10 +1542,10 @@ begin
   begin
     Stream := TStringStream.Create;
     try
-      ReadBlobToStream(TStream(Stream), AStatus, AContext, @(I^.WStr.Ptr));
+      ReadBlobToStream(Stream, AStatus, AContext, @(I^.WStr.Ptr));
       O^.Idx.Val :=
         TlkJSONobject(NativeIntPtr(TjsPtr(I^.Self.Ptr))).
-          Add(I^.Name.Val, WideString(Stream.DataString));
+          Add(I^.Name.Val, Stream.DataString);
     finally
       Stream.Free;
     end;
@@ -1830,11 +1830,11 @@ begin
     Exit;
   Stream := TStringStream.Create;
   try
-    Stream.WriteUnicodeString(
+    Stream.WriteString(
        TlkJSONobject(NativeIntPtr(TjsPtr(I^.Self.Ptr))).
-         getWideString(I^.Idx.Val{$IFDEF NULL_SQL}, B{$ENDIF})
+         getString(I^.Idx.Val{$IFDEF NULL_SQL}, B{$ENDIF})
       );
-    WriteStreamToBlob(TStream(Stream), AStatus, AContext, @(O^.WStr.Ptr));
+    WriteStreamToBlob(Stream, AStatus, AContext, @(O^.WStr.Ptr));
     O^.WStr.Null := B;
   finally
     Stream.Free;
@@ -1931,11 +1931,11 @@ begin
     Exit;
   Stream := TStringStream.Create;
   try
-    Stream.WriteUnicodeString(
+    Stream.WriteString(
        TlkJSONobject(NativeIntPtr(TjsPtr(I^.Self.Ptr))).
-        getWideString(I^.Name.Val{$IFDEF NULL_SQL}, B{$ENDIF})
+        getString(I^.Name.Val{$IFDEF NULL_SQL}, B{$ENDIF})
       );
-    WriteStreamToBlob(TStream(Stream), AStatus, AContext, @(O^.WStr));
+    WriteStreamToBlob(Stream, AStatus, AContext, @(O^.WStr));
     O^.WStr.Null := B;
   finally
     Stream.Free;
@@ -2139,10 +2139,10 @@ begin
   begin
     Stream := TStringStream.Create;
     try
-      ReadBlobToStream(TStream(Stream), AStatus, AContext, @(I^.WStr.Ptr));
+      ReadBlobToStream(Stream, AStatus, AContext, @(I^.WStr.Ptr));
       O^.Idx.Val :=
         TlkJSONlist(NativeIntPtr(TjsPtr(I^.Self.Ptr))).
-          Add(WideString(Stream.DataString));
+          Add(Stream.DataString);
     finally
       Stream.Free;
     end;
@@ -2335,11 +2335,11 @@ begin
     Exit;
   Stream := TStringStream.Create;
   try
-    Stream.WriteUnicodeString(
+    Stream.WriteString(
        TlkJSONcustomlist(NativeIntPtr(TjsPtr(I^.Self.Ptr))).
-         getWideString(I^.Idx.Val{$IFDEF NULL_SQL}, B{$ENDIF})
+         getString(I^.Idx.Val{$IFDEF NULL_SQL}, B{$ENDIF})
       );
-    WriteStreamToBlob(TStream(Stream), AStatus, AContext, @(O^.WStr.Ptr));
+    WriteStreamToBlob(Stream, AStatus, AContext, @(O^.WStr.Ptr));
     O^.WStr.Null := B;
   finally
     Stream.Free;
@@ -2515,30 +2515,25 @@ begin
   O := PjsOutBaseWideValue(AOutMsg);
   O^.WVal.Null := True;
   if I^.Self.Null then Exit;
-  if I^.WVal.Null then
-  begin
+  try
     Stream := TStringStream.Create;
-    try
+    if I^.WVal.Null then
+    begin
       Stream.WriteString
         (TlkJSONbase(NativeIntPtr(TjsPtr(I^.Self.Ptr))).Value);
-      WriteStreamToBlob(TStream(Stream), AStatus, AContext, @(O^.WVal.Ptr));
+      WriteStreamToBlob(Stream, AStatus, AContext, @(O^.WVal.Ptr));
       O^.WVal.Null := False;
-    finally
-      Stream.Free;
-    end;
-  end
-  else
-  begin
-    Stream := TStringStream.Create;
-    try
-      ReadBlobToStream(TStream(Stream), AStatus, AContext, (@I^.WVal.Ptr));
+    end
+    else
+    begin
+      ReadBlobToStream(Stream, AStatus, AContext, (@I^.WVal.Ptr));
       TlkJSONstring(NativeIntPtr(TjsPtr(I^.Self.Ptr))).Value :=
         Stream.DataString;
       O^.WVal.Ptr := I^.WVal.Ptr;
       O^.WVal.Null := False;
-    finally
-      Stream.Free;
     end;
+  finally
+    Stream.Free;
   end;
 end;
 
@@ -2786,7 +2781,7 @@ var
   I: PjsInStringWideGenerate;
   O: PjsObj;
   Stream: TStringStream;
-  S: WideString;
+  S: String;
 begin
   I := PjsInStringWideGenerate(AInMsg);
   O := PjsObj(AOutMsg);
@@ -2796,8 +2791,8 @@ begin
   begin
     Stream := TStringStream.Create;
     try
-      ReadBlobToStream(TStream(Stream), AStatus, AContext, @(I^.WStr.Ptr));
-      S := WideString(Stream.DataString);
+      ReadBlobToStream(Stream, AStatus, AContext, @(I^.WStr.Ptr));
+      S := Stream.DataString;
     finally
       Stream.Free;
     end;
@@ -2805,11 +2800,11 @@ begin
   try
     if I^.Self.Null then // class function
       O^.Ptr :=
-        TjsPtr(NativeIntPtr(TlkJSONstring.Generate(WideString(S))))
+        TjsPtr(NativeIntPtr(TlkJSONstring.Generate(S)))
     else
       O^.Ptr :=
         TjsPtr(NativeIntPtr(TlkJSONstring(NativeIntPtr(TjsPtr(I^.Self.Ptr))).
-          Generate(WideString(S))));
+          Generate(S)));
     O^.Null := False;
   except
     O^.Null := True;
@@ -2941,7 +2936,7 @@ begin
   begin
     Stream := TStringStream.Create;
     try
-      ReadBlobToStream(TStream(Stream), AStatus, AContext, (@I^.Text.Ptr));
+      ReadBlobToStream(Stream, AStatus, AContext, (@I^.Text.Ptr));
       O^.Obj.Ptr :=
         TjsPtr(
            NativeIntPtr(TlkJSON.ParseText(Stream.DataString, I^.Conv.Val))
@@ -2999,7 +2994,7 @@ begin
          TlkJSON.GenerateText(TlkJSONobject(NativeIntPtr(TjsPtr(I^.Obj.Ptr))),
            I^.Conv.Val)
         );
-      WriteStreamToBlob(TStream(Stream), AStatus, AContext, @(O^.Text.Ptr));
+      WriteStreamToBlob(Stream, AStatus, AContext, @(O^.Text.Ptr));
       O^.Text.Null := False;
     finally
       Stream.Free;
@@ -3060,7 +3055,7 @@ begin
          GenerateReadableText(TlkJSONobject(NativeIntPtr(TjsPtr(I^.Obj.Ptr))),
            I^.Level.Val, I^.Conv.Val)
         );
-      WriteStreamToBlob(TStream(Stream), AStatus, AContext, @(O^.Text.Ptr));
+      WriteStreamToBlob(Stream, AStatus, AContext, @(O^.Text.Ptr));
       O^.Text.Null := False;
     finally
       Stream.Free;

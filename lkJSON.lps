@@ -68,9 +68,8 @@
         <CursorPos X="91" Y="1265"/>
         <ExtraEditorCount Value="1"/>
         <ExtraEditor1>
-          <IsVisibleTab Value="True"/>
           <EditorIndex Value="-1"/>
-          <WindowIndex Value="1"/>
+          <WindowIndex Value="-1"/>
           <TopLine Value="839"/>
           <CursorPos X="36" Y="859"/>
         </ExtraEditor1>
