@@ -1283,7 +1283,7 @@ begin
       end;
     end;
     Blob.close(AStatus);
-	Blob := nil;
+    Blob := nil;
   finally
     if Assigned(Blob) then Blob.release;
     TransactionID.release;
@@ -1320,7 +1320,7 @@ begin
       Dec(sSize, Read);
     end;
     Blob.close(AStatus);
-	Blob := nil;
+    Blob := nil;
   finally
     if Assigned(Blob) then Blob.release;
     TransactionID.release;
